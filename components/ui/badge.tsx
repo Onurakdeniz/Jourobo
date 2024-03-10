@@ -15,14 +15,15 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
         outline: "text-foreground",
+        category: "flex gap-2 items-center px-2 text-[10px] rounded-sm font-light",
       },
+       
     },
     defaultVariants: {
       variant: "default",
     },
   }
 )
-
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}

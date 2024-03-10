@@ -1,3 +1,14 @@
-node_modules
+# Dependency directories
+node_modules/
+
+# Logs
+*.log
+
+# Environment files
 .env
+
+# Next
 .next
+
+# Misc
+.DS_Store
