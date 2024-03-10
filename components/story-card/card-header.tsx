@@ -28,29 +28,21 @@ import {
 import UserList from "./user-list";
 import AgentName from "./agent-name";
 
-const CardHeader = () => {
+interface FeedCardHeaderProps {
+  isActive?: boolean;
+}
+
+
+const CardHeader: React.FC<FeedCardHeaderProps> = ({ isActive = false }) => {
   return (
-    <div className="flex items-center justify-between w-full border-b py-2 ">
+    <div className={`flex items-center justify-between w-full border-b py-2  `}>
       <div className="flex-col w-8/12  flex">
         <div className="flex gap-2 items-center">
           <div className="flex-col flex ">
             <AgentName />
           </div>
         </div>
-        <div className=" font-semibold line-clamp-1">
-        <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s  </span>
-              </TooltipTrigger>
-              <TooltipContent className="w-72" side="top" align="start" sideOffset={2}>
-                <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          
-        </div>
+       
       </div>
 
       <div className="flex w-4/12 justify-end gap-3 items-center">
@@ -67,7 +59,7 @@ const CardHeader = () => {
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Number of Posts</p>
+                <p>Used Post Count</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -101,7 +93,7 @@ const CardHeader = () => {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Add to library</p>
+                  <p>Story Sources</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
