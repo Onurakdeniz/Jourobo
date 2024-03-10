@@ -6,7 +6,7 @@ import { Separator } from '../ui/separator'
 const UserList = () => {
   return (
     <div className='flex-col flex w-80'> 
-    <div className='text-sm font-seminold'>User Posts</div>
+    <div className='text-sm font-seminold'>Story Sources</div>
     <Separator className='w-full my-2' />
      <ScrollArea className='min-h-fit max-h-48 flex overflow-y-scroll'>
         <div className='flex-col flex gap-2'> 

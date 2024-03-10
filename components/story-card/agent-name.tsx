@@ -23,11 +23,11 @@ const AgentName = () => {
         <div className="flex gap-1 items-center">
           <Avatar className="h-5 w-5">
             <AvatarFallback> sds </AvatarFallback>
-            <AvatarImage src="/soty.png" />
+            <AvatarImage src="/ethereum.svg" />
           </Avatar>
 
-          <div className="text-base hover:cursor-pointer ">Onur Akdeniz</div>
-          <div className="text-xs ml-1 text-muted-foreground">2h</div>
+          <div className="text-base hover:cursor-pointer ">Daily Ethereum</div>
+          <div className="text-xs ml-1 text-muted-foreground">2h Ago</div>
         </div>
       </HoverCardTrigger>
 
