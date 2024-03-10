@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex-col flex h-screen px-4 ">
+      <body className="flex-col flex h-screen mx-6 ">
         <PrivyProviderWrapper>
           <ThemeProvider
             attribute="class"
