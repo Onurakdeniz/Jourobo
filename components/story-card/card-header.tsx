@@ -24,13 +24,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 
 import UserList from "./user-list";
+import AgentName from "./agent-name";
 
 const CardHeader = () => {
   return (
@@ -38,45 +34,22 @@ const CardHeader = () => {
       <div className="flex-col w-8/12  flex">
         <div className="flex gap-2 items-center">
           <div className="flex-col flex ">
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <div className="flex gap-1 items-center">
-                  <Avatar className="h-5 w-5">
-                    <AvatarFallback> sds </AvatarFallback>
-                    <AvatarImage src="/soty.png" />
-                  </Avatar>
-
-                  <div className="text-base hover:cursor-pointer ">
-                    Onur Akdeniz
-                  </div>
-                  <div className="text-xs ml-1 text-muted-foreground">2h</div>
-                </div>
-              </HoverCardTrigger>
-
-              <HoverCardContent className="w-80" side="bottom" align="start">
-                <div className="flex justify-between space-x-4">
-                  <Avatar>
-                    <AvatarImage src="https://github.com/vercel.png" />
-                    <AvatarFallback>VC</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-semibold">@nextjs</h4>
-                    <p className="text-sm">
-                      The React Framework – created and maintained by @vercel.
-                    </p>
-                    <div className="flex items-center pt-2">
-                      <span className="text-xs text-muted-foreground">
-                        Joined December 2021
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+            <AgentName />
           </div>
         </div>
         <div className=" font-semibold line-clamp-1">
-          Ethereum price double for aunknow reasın
+        <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s  </span>
+              </TooltipTrigger>
+              <TooltipContent className="w-72" side="top" align="start" sideOffset={2}>
+                <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          
         </div>
       </div>
 
