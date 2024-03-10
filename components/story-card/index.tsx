@@ -3,7 +3,7 @@ import CardHeader from './card-header'
 import CardBody from './card-body'
 import CardFooter from './card-footer'
 import { Separator } from '../ui/separator';
-import Comments from './comments';
+
  
 
 interface FeedCardProps {
