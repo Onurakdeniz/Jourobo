@@ -1,0 +1,231 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+enum ActiveStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id                      String              @id @default(uuid())
+  privyUserId             String              @unique
+  fid                     String              @unique
+  createdDate             DateTime            @default(now())
+  updatedAt               DateTime?           @updatedAt
+  username                String              @unique
+  isAdmin                 Boolean?            @default(false)
+  hasFinishedSetup        Boolean?            @default(false)
+  displayName             String
+  exWallet                String?             @unique
+  avatarUrl               String?             @db.VarChar(500)
+  custodyAddress          String?
+  farcasterFollowerCount  Int
+  farcasterFollowingCount Int
+  verifications           String[]
+  verifiedAddresses       VerifiedAddresses[]
+  activeStatus            ActiveStatus
+  agencies                Agency[]
+  profile                 Profile?
+  profileId               String?
+  comments                Comment[]
+  reactions               Reaction[]
+  notifications           Notification[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  story     Story    @relation(fields: [storyId], references: [id])
+  storyId   String
+}
+
+model Reaction {
+  id        String   @id @default(uuid())
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  story     Story    @relation(fields: [storyId], references: [id])
+  storyId   String
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model Profile {
+  id                 String   @id @default(uuid())
+  text               String
+  mentioned_profiles String[]
+  user               User     @relation(fields: [userId], references: [id])
+  userId             String   @unique
+}
+
+model VerifiedAddresses {
+  id           String   @id @default(uuid())
+  ethAddresses String[]
+  solAddresses String[]
+  userId       String
+  User         User     @relation(fields: [userId], references: [id])
+}
+
+model Agency {
+  id          String    @id @default(uuid())
+  name        String
+  created     DateTime  @default(now())
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  description String
+  logo        String
+  aiModels    AIModel[] @relation("AgencyToAIModel")
+  agents      Agent[]
+}
+
+model AIModel {
+  id       String   @id @default(uuid())
+  llm      String
+  model    String
+  tools    String?
+  apiKey   String
+  agencies Agency[] @relation("AgencyToAIModel")
+  agents   Agent[]  @relation("AgentToAIModel")
+}
+
+model Agent {
+  id             String     @id @default(uuid())
+  agency         Agency     @relation(fields: [agencyId], references: [id])
+  agencyId       String
+  name           String
+  description    String
+  temperature    String
+  instructions   String?
+  responseFormat Json?
+  aiModels       AIModel[]  @relation("AgentToAIModel")
+  runPeriod      String
+  prompts        Prompt[]
+  sources        Source[]
+  runs           Run[]
+  stories        Story[]
+  categories     Category[]
+  created        DateTime   @default(now())
+  updated        DateTime   @updatedAt
+  started        DateTime   @default(now())
+  ended          DateTime?
+  state          String
+  focus          String?
+}
+
+enum SourceType {
+  FARCASTER_USER
+  FARCASTER_POST
+  FARCASTER_CHANNEL
+}
+
+model Source {
+  id            String      @id @default(uuid())
+  agentId       String
+  agent         Agent       @relation(fields: [agentId], references: [id])
+  type          SourceType
+  fids          String[]
+  scrapperRunId String
+  scrapperRun   ScrapperRun @relation(fields: [scrapperRunId], references: [id])
+}
+
+model Category {
+  id      String   @id @default(uuid())
+  name    String
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+  agents  Agent[]
+}
+
+model Run {
+  id            String       @id @default(uuid())
+  agentId       String
+  Agent         Agent        @relation(fields: [agentId], references: [id])
+  runNumber     Int
+  scrapperRunId String
+  ScrapperRun   ScrapperRun? // Optional, remove fields and references
+  summaryRunId  String
+  SummaryRun    SummaryRun? // Optional, remove fields and references
+  createdAt     DateTime     @default(now())
+}
+
+model ScrapperRun {
+  id           String    @id @default(uuid())
+  runId        String    @unique
+  Run          Run       @relation(fields: [runId], references: [id])
+  start        DateTime
+  end          DateTime?
+  interval     String
+  scrapingData Json
+  sources      Source[]
+  createdAt    DateTime  @default(now())
+  Story        Story?
+}
+
+model SummaryRun {
+  id        String    @id @default(uuid())
+  runId     String    @unique
+  Run       Run       @relation(fields: [runId], references: [id])
+  promptId  String?
+  Prompt    Prompt?   @relation(fields: [promptId], references: [id])
+  start     DateTime
+  end       DateTime?
+  input     Json
+  llmName   String
+  modelName String
+  cost      Float
+  output    Json
+  storyId   String
+  story     Story?
+  createdAt DateTime  @default(now())
+}
+
+model Prompt {
+  id          String       @id @default(uuid())
+  message     String
+  role        String?
+  created     DateTime     @default(now())
+  updated     DateTime     @updatedAt
+  agent       Agent        @relation(fields: [agentId], references: [id])
+  agentId     String
+  summaryRuns SummaryRun[]
+}
+
+model Story {
+  id            String      @id @default(uuid())
+  title         String
+  content       String
+  summaryRunId  String      @unique
+  SummaryRun    SummaryRun  @relation(fields: [summaryRunId], references: [id])
+  scrapperRunId String      @unique
+  ScrapperRun   ScrapperRun @relation(fields: [scrapperRunId], references: [id])
+  createdAt     DateTime    @default(now())
+  agent         Agent       @relation(fields: [agentId], references: [id])
+  agentId       String
+  tags          String[]
+  comments      Comment[]
+  reactions     Reaction[]
+}
