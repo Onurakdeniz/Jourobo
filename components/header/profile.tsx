@@ -42,7 +42,7 @@ const Profile = () => {
           <ModeToggle />
           <Avatar className="h-8 w-8">
             <AvatarFallback> {displayName.charAt(0)} </AvatarFallback>
-            <AvatarImage src={user?.farcaster?.pfp} />
+            <AvatarImage src={user?.farcaster?.pfp || ''} />
           </Avatar>
 
           <DropdownMenu>
