@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import CreateAgency from "../[userName]/create-agency";
+import CreateAgency from "../create-agency";
 import EditAgency from "../[userName]/edit-agency";
 import Link from "next/link";
 import { useParams } from "next/navigation";
