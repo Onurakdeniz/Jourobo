@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "../theme-toggle";
 import { usePrivy, useLogin } from "@privy-io/react-auth";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 const Profile = () => {
   const { ready, authenticated, user, getAccessToken, isModalOpen, logout } =
     usePrivy();
 
- 
   const displayName = user?.farcaster?.displayName || "User";
 
   const { login } = useLogin({
@@ -28,13 +29,13 @@ const Profile = () => {
   });
 
   console.log("usera", user);
-  <button
-    onClick={login}
-    className="bg-primary-500 text-white px-4 py-2 rounded-md"
-  >
-    Login
-  </button>;
+  console.log("ready", ready);
+  console.log("authenticated", authenticated);
 
+  if (!ready) {
+    return     <Skeleton className=" flex items-center mt-3 h-5 w-[160px]" />
+  }
+ 
   return (
     <>
       {ready && authenticated ? (
@@ -42,7 +43,7 @@ const Profile = () => {
           <ModeToggle />
           <Avatar className="h-8 w-8">
             <AvatarFallback> {displayName.charAt(0)} </AvatarFallback>
-            <AvatarImage src={user?.farcaster?.pfp || ''} />
+            <AvatarImage src={user?.farcaster?.pfp || ""} />
           </Avatar>
 
           <DropdownMenu>
@@ -73,12 +74,9 @@ const Profile = () => {
       ) : (
         <div className="flex w-3/12 gap-2 items-center justify-end">
           <ModeToggle />
-          <button
-            onClick={login}
-            className="bg-primary-500 text-white px-4 py-2 rounded-md"
-          >
+          <Button onClick={login} className="px-4 py-2 rounded-md">
             Login
-          </button>
+          </Button>
         </div>
       )}
     </>

@@ -12,13 +12,13 @@ import { Button } from "../ui/button";
 const CardFooter = () => {
   return (
     <div className="flex gap-2">
-      <div className="flex gap-1 items-center border px-2 py-1 bg-primary/5 rounded-full">
-        <Button variant="ghost" size="sm" className="h-6 px-1">
+      <div className="flex gap-1 items-center border px-2 py-0 md:py-1  bg-primary/5 rounded-full">
+        <Button variant="ghost" size="sm" className="h-4 md:h-6 px-1">
           <MessageSquare size={16} />
         </Button>
-        <div className="text-xs">23 Comments</div>
+        <div className="flex  text-xs">23 <span className="hidden md:flex">  Comments </span></div>
       </div>
-      <div className="flex gap-2 items-center border px-2 py-1 bg-primary/5 rounded-full">
+      <div className="hidden md:flex gap-2 items-center border px-2 py-1 bg-primary/5 rounded-full">
         <Eye size={16} />
         <div className="text-xs">2323 Views</div>
       </div>

@@ -16,10 +16,10 @@ const CardBody = () => {
 
  
   return (
-    <div  > 
-    <div className="flex-col flex gap-2">
-      <div className="italic text-pretty font-bold">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been</div>
-      <div className="flex gap-2 items-center">
+ <div className="flex w-full flex-wrap">
+    <div className="flex-col flex gap-2 w-full  flex-1">
+      <div className="flex  w-full italic text-pretty font-bold">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been</div>
+      <div className="flex gap-2 w-full items-center">
         <Link href="/ethereum">
           <Badge
             variant="outline"
@@ -30,13 +30,14 @@ const CardBody = () => {
         </Link>
       </div>
       <div className="flex-col flex gap-3 text-sm text-pretty italic font-light py-2">
-      <div className="flex w-full gap-2 items-start " >
+      <div className=" flex  w-full gap-16 items-start " >
        
-     
-        <span className=" w-1/2">
-      <span className=" uppercase text-lg font-bold">Ethereum </span>, often dubbed as the "world computer," is a decentralized platform that enables the creation and execution of smart contracts and decentralized applications (DApps). Launched in 2015 by Vitalik Buterin and a group of developers, Ethereum introduced the concept of a blockchain with a built-in programming language, allowing developers to build a wide range of applications beyond simple transactions. At its core, Ethereum operates on a blockchain similar to Bitcoin's, but with added functionality that extends beyond simple value transfer.
+      
+        <span className=" flex w-9/12  ">
+      Ethereum, often dubbed as the "world computer," is a decentralized platform that enables the creation and execution of smart contracts and decentralized applications (DApps). Launched in 2015 by Vitalik Buterin and a group of developers, Ethereum introduced the concept of a blockchain with a built-in programming language, allowing developers to build a wide range of applications beyond simple transactions. At its core, Ethereum operates on a blockchain similar to Bitcoin's, but with added functionality that extends beyond simple value transfer.
 </span>
-<Image src="/newsdark.png" alt="ethereum" className="flex w-1/2 rounded-lg" width={200} height={120} />
+ 
+<Image src="/news.webp" alt="ethereum" className="flex w-3/12  rounded-lg" width={200} height={200} />
  </div>
 <span className="mt-4"> One of the key innovations of Ethereum is its Turing-complete scripting language, Solidity. This language enables developers to write smart contracts, self-executing contracts with the terms of the agreement directly written into code. Smart contracts on Ethereum can facilitate a variety of transactions, from token issuance and decentralized finance (DeFi) protocols to decentralized autonomous organizations (DAOs) and non-fungible tokens (NFTs). This flexibility has led to the rapid growth of the Ethereum ecosystem, with thousands of DApps and tokens built on the platform.</span>
 
@@ -44,6 +45,7 @@ const CardBody = () => {
  </div>
     </div>
     </div>
+ 
   );
 };
 

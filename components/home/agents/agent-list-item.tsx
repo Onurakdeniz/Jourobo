@@ -19,22 +19,12 @@ const AgentListItem = () => {
   };
 
   return (
-    <div className="flex justify-between items-center">
-       <AgentName />
+    <div className="flex justify-between items-center h-8">
+       <AgentName isNavbar={true} />
       <div className="flex gap-2 items-center">
       
-        <Button
-          variant="ghost"
-          className="hover:bg-transparent hover:text-orange-200"
-          size="sm"
-          onClick={handleClick}
-        >
-          {isFollowing ? (
-            <Eye size={16} className="text-orange-600" />
-          ) : (
-            <Eye size={16} />
-          )}
-        </Button>
+        
+       
         <Badge variant="default" className="text-xs px-1 py-0 justify-end">
           <span>232</span>
         </Badge>
