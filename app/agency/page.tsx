@@ -24,6 +24,7 @@ import BeatLoader from "react-spinners/BeatLoader";
 import { useFetchAgencies } from "@/hooks/useFetchAgencies";
 import { useAgencyStore } from "@/store/agency";
 import { useSearchParams } from "next/navigation";
+import CreateAgency from "./create-agency";
 
 const override: CSSProperties = {
   display: "block",
@@ -93,6 +94,9 @@ const page = () => {
             Please fill in the information below to create your agency.
           </DialogDescription>
         </DialogHeader>
+        <CreateAgency
+         setOpen={setOpen}
+        />
  
       </DialogContent>
     </Dialog>

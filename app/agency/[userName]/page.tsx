@@ -18,7 +18,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import CreateAgency from "./create-agency";
+import CreateAgency from "../create-agency";
 import { useQuery } from "@tanstack/react-query";
 import BeatLoader from "react-spinners/BeatLoader";
 import { useFetchAgencies } from "@/hooks/useFetchAgencies";
