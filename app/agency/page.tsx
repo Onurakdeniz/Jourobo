@@ -37,9 +37,7 @@ const color = "#123abc";
 const page = () => {
   const [open, setOpen] = useState(false);
 
-  const {   isLoading, error } = useFetchAgencies();
-
-  const agenciesState = null
+  const { agenciesState, isLoading, error } = useFetchAgencies();
 
   if (error) {
     return (
