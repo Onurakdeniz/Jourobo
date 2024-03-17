@@ -28,7 +28,7 @@ const PostsStat = () => {
                   className="rounded-sm border-none font-bold bg-orange-600 text-white mr-2"
                 >
                   {" "}
-                  8h
+                  8h Ago
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>

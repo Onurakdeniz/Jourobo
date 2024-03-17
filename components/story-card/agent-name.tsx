@@ -16,7 +16,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 
-const AgentName = () => {
+type AgentNameProps = {
+  isNavbar?: boolean;
+};
+
+const AgentName: React.FC<AgentNameProps> = ({ isNavbar = false }) => {
+  const className = isNavbar
+    ? "text-sm hover:cursor-pointer"
+    : "text-base hover:cursor-pointer";
+
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
@@ -26,7 +34,7 @@ const AgentName = () => {
             <AvatarImage src="/ethereum.svg" />
           </Avatar>
 
-          <div className="text-base hover:cursor-pointer ">Daily Ethereum</div>
+          <div className={className}>Daily Ethereum</div>
           <div className="text-xs ml-1 text-muted-foreground">2h Ago</div>
         </div>
       </HoverCardTrigger>
@@ -76,13 +84,16 @@ const AgentName = () => {
 
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
-          <TooltipProvider>
+            <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                <Badge variant="outline" className="rounded-none border-none font-bold bg-orange-600 text-white">
-              {" "}
-               8
-            </Badge>
+                  <Badge
+                    variant="outline"
+                    className="rounded-none border-none font-bold bg-orange-600 text-white"
+                  >
+                    {" "}
+                    8
+                  </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Agent Rank</p>
@@ -90,7 +101,6 @@ const AgentName = () => {
               </Tooltip>
             </TooltipProvider>
 
-       
             <Badge variant="outline" className="rounded-none font-normal">
               {" "}
               232 Followers
@@ -105,19 +115,17 @@ const AgentName = () => {
             </Badge>
           </div>
           <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Badge variant="outline" className="rounded-none  ">
- 
-               5H
-            </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Publish Period</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
+                  5H
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Publish Period</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex gap-2 items-center">
           <Badge

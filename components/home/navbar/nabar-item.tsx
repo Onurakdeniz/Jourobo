@@ -18,9 +18,9 @@ interface NavbarItemProps {
         href={href}
         className={`w-full items-center flex gap-3 ${active ? "active" : ""}`}
       >
-        <div className="flex items-center gap-4 text-base w-full">
+        <div className="flex items-center gap-6 text-base w-full">
           <div className="w-4"> {icon}</div>
-          <span className="font-normal">{title}</span>
+          <span className="font-semibold text-sm">{title}</span>
         </div>
       </Link>
     );

@@ -12,7 +12,7 @@ interface FeedCardProps {
 
 const FeedCard: React.FC<FeedCardProps> = ({ isActive = false }) => {
   return (
-    <div className={`flex-col flex gap-2 w-full px-4 py-2 border rounded-xl  ${isActive ? 'bg-primary/5 ' : ''}`}>
+    <div className={`flex-col flex flex-1 gap-2 w-full px-4 py-2 border rounded-xl  ${isActive ? 'bg-primary/5 ' : ''}`}>
         <CardHeader isActive={isActive} />
         <CardBody />
         <CardFooter />

@@ -10,6 +10,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
+
+
   try {
     const verifiedClaims = await privy.verifyAuthToken(accessToken.value);
     const { userId } = verifiedClaims;
@@ -32,9 +34,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       api_key: process.env.NEYNAR_API_KEY,
     });
 
-    const userData = sdkResponse.data.users[0];
+    const userData = sdkResponse.data;
+    console.log(userData, "userData");
 
-    const user = await upsertUser(userData, privyUser);
+    const user = await upsertUserWithRelations(userData, privyUser.id);
 
     return new NextResponse(JSON.stringify({ user }), {
       status: 201,
@@ -51,62 +54,85 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       },
     });
   }
+} 
+
+type UserProfile = {
+  object: string;
+  fid: number;
+  custody_address: string;
+  username: string;
+  display_name: string;
+  pfp_url: string;
+  profile: {
+    bio: {
+      text: string;
+      mentioned_profiles: any[];
+    };
+  };
+  follower_count: number;
+  following_count: number;
+  verifications: string[];
+  verified_addresses: {
+    eth_addresses: string[];
+    sol_addresses: string[];
+  };
+  active_status: string;
+};
+
+type UserContainer = {
+  users: UserProfile[];
+};
+
+async function upsertUserWithRelations(userData: UserContainer, privyUser: string) {
+  const user = userData.users[0];
+
+  // Upsert User
+  const upsertedUser = await prisma.user.upsert({
+    where: {
+      privyUserId: privyUser,
+    },
+    create: {
+      privyUserId: privyUser,
+      custodyAddress: user.custody_address,
+      
+      verifications: user.verifications,
+    },
+    update: {
+      custodyAddress: user.custody_address,
+      verifications: user.verifications,
+    },
+  });
+
+  // Upsert Profile associated with the User
+  const upsertedProfile = await prisma.profile.upsert({
+    where: {
+      fid: user.fid,
+    },
+    create: {
+      fid: user.fid,
+      bioText: user.profile.bio.text,
+      mentioned_profiles: user.profile.bio.mentioned_profiles,
+      userName: user.username,
+      activeStatus: user.active_status,
+      displayName: user.display_name,
+      avatarUrl: user.pfp_url,
+      farcasterFollowerCount: user.follower_count,
+      farcasterFollowingCount: user.following_count,
+      user: {
+        connect: { id: upsertedUser.id },
+      },
+    },
+    update: {
+      bioText: user.profile.bio.text,
+      mentioned_profiles: user.profile.bio.mentioned_profiles,
+      userName: user.username,
+      activeStatus: user.active_status,
+      displayName: user.display_name,
+      avatarUrl: user.pfp_url,
+      farcasterFollowerCount: user.follower_count,
+      farcasterFollowingCount: user.following_count,
+    },
+  });
+
+  return { upsertedUser, upsertedProfile };
 }
-async function upsertUser(userData: any , privyUser: any) {
- 
-        const user = await prisma.user.upsert({
-            where: {
-              privyUserId: privyUser.id,
-            },
-            update: {
-              fid: String(userData.fid),
-              custodyAddress: userData.custody_address,
-              username: userData.username,
-              displayName: userData.display_name,
-              avatarUrl: userData.pfp_url,
-              farcasterFollowerCount: userData.follower_count,
-              farcasterFollowingCount: userData.following_count,
-              verifications: userData.verifications,
-              activeStatus: userData.active_status.toUpperCase(),
-        profile: {
-          upsert: {
-            where: { id: userData.profileId }, // Use the correct unique identifier
-            update: {
-              text: userData.profile.bio.text,
-              mentioned_profiles: userData.profile.bio.mentioned_profiles,
-            },
-            create: {
-              text: userData.profile.bio.text,
-              mentioned_profiles: userData.profile.bio.mentioned_profiles,
-            },
-          },
-        },
-      },
-      create: {
-        privyUserId: privyUser.id,
-        fid: String(userData.fid),
-        custodyAddress: userData.custody_address,
-        username: userData.username,
-        displayName: userData.display_name,
-        avatarUrl: userData.pfp_url,
-        farcasterFollowerCount: userData.follower_count,
-        farcasterFollowingCount: userData.following_count,
-        verifications: userData.verifications,
-        verifiedAddresses: {
-          create: {
-            ethAddresses: userData.verified_addresses.eth_addresses,
-            solAddresses: userData.verified_addresses.sol_addresses,
-          },
-        },
-        activeStatus: userData.active_status.toUpperCase(),
-        profile: {
-          create: {
-            text: userData.profile.bio.text,
-            mentioned_profiles: userData.profile.bio.mentioned_profiles,
-          },
-        },
-      },
-    });
-  
-    return user;
-  }

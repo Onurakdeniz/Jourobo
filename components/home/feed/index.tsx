@@ -8,7 +8,7 @@ const Feed = () => {
     <div className="flex-col flex w-full">
       <Tabs defaultValue="trending" className=" h-full">
         <FeedTop />
-        <TabsContent value="trending" className="mt-4 ">
+        <TabsContent value="trending" className="mt-2 md:mt-4 ">
           <FeedContent />
         </TabsContent>
         <TabsContent value="latest"></TabsContent>
