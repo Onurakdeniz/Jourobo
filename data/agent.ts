@@ -13,7 +13,15 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
         aiModels: true,
         prompts: true,
         categories: true,
-        tasks: true,
+        tasks: {
+          include: {
+            runs: {
+              include: {
+                story: true, // Include related Story record for each Run
+              },
+            },
+          },
+        },
       },
     });
 
@@ -27,7 +35,17 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
       },
     });
 
-    return { ...agent, storyCount };
+    // Create a new array of tasks with the runsCount and totalViews properties
+    const tasksWithRunsCountAndViews = agent.tasks.map(task => ({
+      ...task,
+      runsCount: task.runs.length,
+      totalViews: task.runs.reduce((total, run) => total + (run.story ? run.story.views : 0), 0),
+    }));
+
+    // Create a new agent object with the tasksWithRunsCountAndViews and storyCount properties
+    const agentWithStoryCountAndViews = { ...agent, tasks: tasksWithRunsCountAndViews, storyCount };
+
+    return agentWithStoryCountAndViews;
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Agent retrieval failed with error: ${error.message}`);

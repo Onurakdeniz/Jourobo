@@ -522,3 +522,38 @@ export const StorySchema: z.ZodType<Story> = BaseSchema.extend({
   bookmarks: z.array(BookmarkSchema),
   points: z.array(PointSchema),
 });
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+enum SourceType {
+  FARCASTER_USER = "FARCASTER_USER",
+  FARCASTER_POST = "FARCASTER_POST",
+  FARCASTER_CHANNEL = "FARCASTER_CHANNEL",
+}
+
+export const CreateTaskSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().min(1),
+  isStaticRun: z.boolean(),
+  interval: z.string().optional(),
+  prompt: z.object({
+    promptMessage: z.object({
+      content: z.string().min(1),
+    }),
+    systemMessage: z.object({
+      content: z.string().optional(),
+    }),
+  }),
+  aiModel: z.object({
+    llm: z.string().optional(),
+    model: z.string().optional(),
+    apiKey: z.string().optional(),
+  }),
+  source: z.object({
+    type: z.nativeEnum(SourceType),
+    ids: z.array(z.string().min(1)),
+  }),
+});

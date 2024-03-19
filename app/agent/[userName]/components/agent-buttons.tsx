@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Newspaper, PencilRuler, Bot } from "lucide-react";
+import { ClipboardCheck, FileText, Bot } from "lucide-react";
 import React from "react";
 import {
   Tooltip,
@@ -28,20 +28,7 @@ const AgentButtons = () => {
 
   return (
     <div className="flex gap-2 items-center">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link className="w-full" href={`/agency/${agentId}/create-agent`}>
-              <Button variant="secondary">
-                <Bot size={24} />
-              </Button>
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Create Agent</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      
 
       <TooltipProvider>
         <Dialog open={editAgency} onOpenChange={setEditAgency}>
@@ -49,7 +36,7 @@ const AgentButtons = () => {
             <TooltipTrigger asChild>
               <DialogTrigger asChild>
                 <Button variant="outline">
-                  <Newspaper size={20} />
+                  <Bot size={20} />
                 </Button>
               </DialogTrigger>
             </TooltipTrigger>
@@ -79,23 +66,26 @@ const AgentButtons = () => {
                   size="sm"
                   className="flex gap-1 h-full p-2"
                 >
-                  <Newspaper size={16} />
-                  <span>Create Task</span>
+                  <FileText size={16} />
+                  <span>Create Prompt</span>
                 </Button>
               </DialogTrigger>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Create Task</p>
+              <p>Create Prompt</p>
             </TooltipContent>
           </Tooltip>
 
           <DialogContent className="w-full max-w-xl mx-auto flex-col flex h-fit py-6">
             <DialogHeader>
-              <DialogTitle>Create Agency</DialogTitle>
+              <DialogTitle>Create Prompt</DialogTitle>
               <DialogDescription>
-                Please fill in the information below to create your agency.
+                Please fill in the information below to create a new prompt.
               </DialogDescription>
             </DialogHeader>
+
+
+
           </DialogContent>
         </Dialog>
       </TooltipProvider>
@@ -110,7 +100,7 @@ const AgentButtons = () => {
                   size="sm"
                   className="flex gap-1 h-full p-2"
                 >
-                  <Newspaper size={16} />
+                  <ClipboardCheck size={16} />
                   <span>Create Task</span>
                 </Button>
                 </Link>
