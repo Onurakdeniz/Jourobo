@@ -29,8 +29,7 @@ export async function GET(
     if (error instanceof Error) {
       console.error(`GET request failed with error: ${error.message}`);
     } else {
-      console.error('GET request failed with an unknown error');
+      console.error("GET request failed with an unknown error");
     }
   }
 }
- 

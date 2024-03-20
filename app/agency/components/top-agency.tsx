@@ -69,8 +69,8 @@ const TopAgency = () => {
               : ""
           }
           entityLogo={selectedAgency?.logo || ""}
-          ownerName={selectedAgency?.owners[0]?.username || ""}
-          ownerAvatar={selectedAgency?.owners[0]?.avatarUrl || ""}
+          ownerName={selectedAgency?.owners[0]?.user?.profile?.userName || ""}
+          ownerAvatar={selectedAgency?.owners[0]?.user?.profile?.avatarUrl || ""}
         />
       </div>
       <div className="flex w-6/12 ml-12 h-full gap-4 justify-end items-center">

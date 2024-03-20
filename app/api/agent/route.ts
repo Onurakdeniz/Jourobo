@@ -4,43 +4,57 @@ import { NextRequest, NextResponse } from "next/server";
 import { CreateAgentSchema } from "@/schemas";
 import * as z from "zod";
 import { authMiddleware } from "@/lib/authMiddleware";
+import { signOpenAIKey } from "@/lib/signOpenAIKey";
 
 type CreateAgentData = z.infer<typeof CreateAgentSchema>;
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    // Extracting the JSON body from the request
     const { agencyId, action = "createAgent", ...data } = await req.json();
+    const agencyUserName = agencyId;
 
-    console.log("agencyId", agencyId);
-    console.log("data", data);
-
-    // Authentication and user validation
     const currentUser = await authMiddleware(req);
+    console.log("currentUser", currentUser);
 
-    // Handle different actions based on the 'action' parameter
+    // Ensure currentUser is not a NextResponse before proceeding
+    if (!("id" in currentUser)) {
+      // Handle the case where currentUser does not have an id (e.g., not authenticated)
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+    console.log("currentUser", currentUser);
+
+    const isOwner = await isAgencyOwner(currentUser.id, agencyUserName);
+    if (!isOwner) {
+      return NextResponse.json(
+        { error: "Unauthorized: User is not the agency owner" },
+        { status: 403 }
+      );
+    }
+    console.log("isOwner", isOwner);
+
     switch (action) {
       case "createAgent":
-        const agent = await createAgentByAgencyId(
+        const agent = await createAgentByAgencyUserName(
           data as CreateAgentData,
-          agencyId as string
+          agencyUserName
         );
         return NextResponse.json(agent, { status: 201 });
-      // Handle other actions as needed...
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error: unknown) {
-    console.error("Error creating agent:", error);
-    let errorMessage = 'An error occurred';
+    console.error("Error in processing request:", error);
+    let errorMessage = "An error occurred during the process.";
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    return new NextResponse(
-      JSON.stringify({
-        message: "Error creating agent",
-        error: errorMessage,
-      }),
+    return NextResponse.json(
+      {
+        message: errorMessage,
+      },
       {
         status: 500,
         headers: {
@@ -51,35 +65,65 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-async function createAgentByAgencyId(
+async function isAgencyOwner(
+  userId: string,
+  agencyUserName: string
+): Promise<boolean> {
+  try {
+    const agency = await prisma.agency.findUnique({
+      where: {
+        userName: agencyUserName,
+      },
+    });
+
+    // Early return false if the agency doesn't exist
+    if (!agency) return false;
+
+    const ownerRecord = await prisma.agencyOwner.findUnique({
+      where: {
+        userId_agencyId: {
+          userId,
+          agencyId: agency.id,
+        },
+      },
+    });
+
+    return !!ownerRecord;
+  } catch (error) {
+    console.error(
+      `Error checking agency ownership: ${(error as Error).message}`
+    );
+    throw error;
+  }
+}
+
+async function createAgentByAgencyUserName(
   data: CreateAgentData,
-  agencyId: string
+  agencyUserName: string
 ): Promise<any> {
   const { userName, aiModel, profile, categories } = data;
 
   try {
+    // Sign the OpenAI API key
+    const signedApiKey = await signOpenAIKey(aiModel.apiKey, userName);
+
     return await prisma.agent.create({
       data: {
         userName,
         agency: {
           connect: {
-            userName: agencyId,
+            userName: agencyUserName,
           },
         },
         aiModels: {
           create: {
             llm: aiModel.llm,
             model: aiModel.model,
-            apiKey: aiModel.apiKey,
+            apiKey: signedApiKey, // Use the signed JWT instead of the raw API key
           },
         },
         profile: {
-          create: {
-            name: profile.name,
-            avatarUrl: profile.avatarUrl,
-            description: profile.description,
-            defaultInstructions: profile.defaultInstructions,
-          },
+          create: profile,
         },
         ...(categories && categories.length > 0
           ? {
@@ -93,17 +137,19 @@ async function createAgentByAgencyId(
           : {}),
       },
     });
-  } catch (error: unknown) {
-    let errorMessage = 'Agent creation failed';
-    if (error instanceof Error) {
-      console.error(`Agent creation failed with error: ${error.message}`);
-      errorMessage = error.message;
-    } else {
-      console.error(`Agent creation failed with error: ${error}`);
-    }
-    throw new Error(errorMessage);
+  } catch (error) {
+    console.error(
+      `Agent creation failed with error: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+    throw new Error("Agent creation failed");
+  } finally {
+    await prisma.$disconnect();
   }
 }
+
+export { createAgentByAgencyUserName };
 
 function handleError(error: Error): NextResponse {
   let statusCode: number;

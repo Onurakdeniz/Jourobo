@@ -27,12 +27,12 @@ const EntityInfo: React.FC<EntityInfoProps> = ({
 }) => {
   return (
     <div className="flex gap-2 items-start my-auto justify-between w-full ">
-      <div className="flex gap-1 pl-1 items-center">
+      <div className="flex gap-2 pl-1 items-center">
         <Avatar className="h-12 w-12 rounded-md">
           <AvatarFallback className="h-12 w-12 text-lg font-bold rounded-md">
             {entityName ? entityName[0].toUpperCase() : ""}
           </AvatarFallback>
-          <AvatarImage src={entityLogo} className="border-2" />
+          <AvatarImage src={entityLogo} className=" " />
         </Avatar>
         <TooltipProvider>
           <div className="flex-col flex gap-1 items-start">

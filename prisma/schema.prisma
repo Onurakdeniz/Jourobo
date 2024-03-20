@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())
+  id                String              @id @default(uuid())     @unique
   privyUserId       String              @unique
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -137,31 +137,34 @@ model AgencyOwner {
 }
 
 model AIModel {
-  id     String   @id @default(uuid())
-  llm    String
-  model  String
-  tools  String?
-  apiKey String
-  runs   LLMRun[]
-  agents Agent[]  @relation("AgentToAIModel")
+  id               String  @id @default(uuid())
+  llm              String
+  model            String
+  tools            String?
+  apiKey           String
+  tasks            Task[]
+  agents           Agent[] @relation("AgentToAIModel")
+  defaultForAgents Agent[] @relation("DefaultAIModelToAgent")
 }
 
 model Agent {
-  id         String        @id @default(uuid())
-  agencyId   String
-  created    DateTime      @default(now())
-  updated    DateTime      @updatedAt
-  userName   String        @unique
-  agency     Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  followers  Follow[]
-  points     Point[]
-  profile    ProfileAgent?
-  prompts    Prompt[]
-  sources    Source[]
-  stories    Story[]
-  tasks      Task[]
-  aiModels   AIModel[]     @relation("AgentToAIModel")
-  categories Category[]    @relation("AgentToCategory")
+  id               String        @id @default(uuid())
+  agencyId         String
+  created          DateTime      @default(now())
+  updated          DateTime      @updatedAt
+  userName         String        @unique
+  agency           Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  followers        Follow[]
+  points           Point[]
+  profile          ProfileAgent?
+  prompts          Prompt[]
+  sources          Source[]
+  stories          Story[]
+  tasks            Task[]
+  aiModels         AIModel[]     @relation("AgentToAIModel")
+  defaultAiModelId String?
+  defaultAiModel   AIModel?      @relation("DefaultAIModelToAgent", fields: [defaultAiModelId], references: [id])
+  categories       Category[]    @relation("AgentToCategory")
 }
 
 model ProfileAgent {
@@ -176,15 +179,13 @@ model ProfileAgent {
 }
 
 model Source {
-  id              String      @id @default(uuid())
+  id              String     @id @default(uuid())
   agentId         String
   type            SourceType
-  farUserIds      String[]
-  farPostIds      String[]
-  farChannelNames String[]
+  ids             String[]
   scrapperRunId   String
-  agent           Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  scrapperRun     ScrapperRun @relation(fields: [scrapperRunId], references: [id], onDelete: Cascade)
+  agent           Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  runs            Run        @relation(fields: [scrapperRunId], references: [id], onDelete: Cascade)
 }
 
 model Category {
@@ -196,89 +197,97 @@ model Category {
 }
 
 model Task {
-  id            String       @id @default(uuid())
-  agentId       String
-  scrapperRunId String?
-  LLMRunId      String?
-  createdAt     DateTime     @default(now())
-  isOneTimeRun  Boolean      @default(true)
-  frequency     Int?
-  state         TaskState    @default(INACTIVE)
-  description   String?
-  name          String
-  LLMRun        LLMRun?
-  ScrapperRun   ScrapperRun?
-  Agent         Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  id           String     @id @default(uuid())
+  agentId      String
+  createdAt    DateTime   @default(now())
+  isOneTimeRun Boolean    @default(true)
+  interval     Int?
+  state        TaskState? @default(ACTIVE)
+  description  String?
+  name         String
+  Agent        Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  runs         Run[]
+  promptId     String
+  Prompt       Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  aiModelId    String
+  AIModel      AIModel    @relation(fields: [aiModelId], references: [id], onDelete: Cascade)
 }
 
-model ScrapperRun {
-  id           String    @id
-  taskId       String    @unique
-  start        DateTime
-  end          DateTime?
-  interval     String
-  scrapingData Json
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime? @updatedAt
-  status       RunStatus @default(PENDING)
-  Task         Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  sources      Source[]
-  Story        Story?
-}
-
-model LLMRun {
-  id        String    @id @default(uuid())
-  taskId    String    @unique
-  promptId  String?
-  start     DateTime
-  end       DateTime?
-  aiModelId String
-  cost      Float
-  tokens    Float
-  output    Json
-  storyId   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  status    RunStatus @default(PENDING)
-  AIModel   AIModel   @relation(fields: [aiModelId], references: [id], onDelete: Cascade)
-  Prompt    Prompt?   @relation(fields: [promptId], references: [id], onDelete: Cascade)
-  Task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+model Run {
+  id        String      @id @default(uuid())
+  taskId    String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime?   @updatedAt
+  status    RunStatus   @default(PENDING)
+  Task      Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   story     Story?
+  sources   Source[]
+  cost      Float?
+  tokens    Float?
+  results   RunResult[]
+}
+
+model RunResult {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  run          Run      @relation(fields: [runId], references: [id])
+  runId        String
+  sourceOutput Json?
+  llmOutput    Json?
 }
 
 model Prompt {
-  id                 String   @id @default(uuid())
-  prompt             String
-  role               String?
-  responseFormat     Json?
-  outputStyle        String?
-  temperature        String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  agentId            String
-  customInstructions String?
-  LLMRuns            LLMRun[]
-  agent              Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  id             String          @id @default(uuid())
+  prompt         String
+  responseFormat Json?
+  outputStyle    String?
+  temperature    Float?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  agentId        String
+  tasks          Task[]
+  agent          Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  promptMessage  PromptMessage[]
+  systemMessage  SystemMessage[]
+}
+
+model PromptMessage {
+  id        String   @id @default(uuid())
+  role      String   @default("user")
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  promptId  String
+  prompt    Prompt   @relation(fields: [promptId], references: [id])
+}
+
+model SystemMessage {
+  id        String   @id @default(uuid())
+  role      String   @default("system")
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  promptId  String
+  prompt    Prompt   @relation(fields: [promptId], references: [id])
 }
 
 model Story {
-  id            String      @id @default(uuid())
-  title         String
-  content       String
-  LLMRunID      String      @unique
-  scrapperRunId String      @unique
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  agentId       String
-  tags          String[]
-  views         Int         @default(0)
-  bookmarks     Bookmark[]
-  comments      Comment[]
-  points        Point[]
-  LLMRun        LLMRun      @relation(fields: [LLMRunID], references: [id])
-  agent         Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  ScrapperRun   ScrapperRun @relation(fields: [scrapperRunId], references: [id])
-  votes         Vote[]
+  id        String     @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  agentId   String
+  tags      String[]
+  views     Int        @default(0)
+  bookmarks Bookmark[]
+  comments  Comment[]
+  points    Point[]
+  agent     Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  runId     String     @unique
+  run       Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  votes     Vote[]
 }
 
 model Point {
