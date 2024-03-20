@@ -8,7 +8,7 @@ async function fetchAgencyData() {
     throw new Error("Failed to fetch agencies. Please try again later.");
   }
   const data = await response.json();
-  console.log("datafata", data);
+ 
   return data.agencies; // directly return the array
 }
 
@@ -33,7 +33,7 @@ export const useFetchAgencies = () => {
     setAgencies(agencies);
   }
 
-  console.log("agenciesState", agenciesState);
+ 
 
   return { agenciesState, isLoading, error, refetch };
 };

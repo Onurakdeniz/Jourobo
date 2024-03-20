@@ -17,7 +17,7 @@ export const useFetchAgent = () => {
       throw new Error("Agent not found !");
     }
     const data = await response.json();
-    console.log("moraa", data);
+ 
     return data.agent;
   }
 
@@ -31,14 +31,13 @@ export const useFetchAgent = () => {
     queryKey: ["agent", { agentUserName }], // Include agentUserName in the queryKey
     queryFn: fetchAgentData,
     refetchOnWindowFocus: false,
-    staleTime: Infinity, // Prevent the data from being considered stale
+ 
   });
 
   if (isSuccess) {
     setAgent(agent);
   }
-
-  console.log("agentState", agentState);
+ 
 
   return { agentState, isLoading, error, refetch };
 };

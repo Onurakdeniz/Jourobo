@@ -17,7 +17,7 @@ const override: CSSProperties = {
 const page = () => {
   const { agentState, isLoading, error, refetch } = useFetchAgent();
   const agentId = useParams().userName;
-  console.log("agentState", agentState);
+ 
 
   const taskCount = agentState?.tasks?.length || 0;
 

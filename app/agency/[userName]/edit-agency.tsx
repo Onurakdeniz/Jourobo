@@ -64,8 +64,7 @@ const EditAgency = ({ setOpen }: { setOpen: (value: boolean) => void }) => {
 
   const { watch, setError, clearErrors } = form;
   const userName = watch("userName");
-
-  console.log("userNamed:", userName);
+ 
 
   const [usernameAvailable, setUsernameAvailable] = useState(true);
 
@@ -96,7 +95,7 @@ const EditAgency = ({ setOpen }: { setOpen: (value: boolean) => void }) => {
       const delayDebounceFn = setTimeout(async () => {
         try {
           const available = await checkUsernameAvailability(userName);
-          console.log("username available:", available);
+ 
           setUsernameAvailable(available);
 
           if (!available) {
@@ -136,7 +135,7 @@ const EditAgency = ({ setOpen }: { setOpen: (value: boolean) => void }) => {
       }
 
       const requestBody = { data, action: "update", id: agencyDetails.id };
-      console.log("requestBody:", requestBody);
+ 
 
       const response = await fetch("/api/agency", {
         method: "POST",
@@ -156,7 +155,7 @@ const EditAgency = ({ setOpen }: { setOpen: (value: boolean) => void }) => {
       toast("Agency updated successfully");
 
       setOpen(false);
-      console.log("res:", res);
+      
       router.forward;
     }  catch (error) {
       console.error("Failed to update agency:", error);

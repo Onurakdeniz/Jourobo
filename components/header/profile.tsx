@@ -28,9 +28,7 @@ const Profile = () => {
     },
   });
 
-  console.log("usera", user);
-  console.log("ready", ready);
-  console.log("authenticated", authenticated);
+ 
 
   if (!ready) {
     return     <Skeleton className=" flex items-center mt-3 h-5 w-[160px]" />
@@ -65,8 +63,7 @@ const Profile = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
+          
               <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

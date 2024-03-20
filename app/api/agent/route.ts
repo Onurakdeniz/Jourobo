@@ -1,4 +1,3 @@
-import { privy } from "@/lib/privy";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { CreateAgentSchema } from "@/schemas";
@@ -12,9 +11,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { agencyId, action = "createAgent", ...data } = await req.json();
     const agencyUserName = agencyId;
-
     const currentUser = await authMiddleware(req);
-    console.log("currentUser", currentUser);
+
+ 
 
     // Ensure currentUser is not a NextResponse before proceeding
     if (!("id" in currentUser)) {
@@ -24,7 +23,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         { status: 401 }
       );
     }
-    console.log("currentUser", currentUser);
+
+ 
 
     const isOwner = await isAgencyOwner(currentUser.id, agencyUserName);
     if (!isOwner) {
@@ -33,8 +33,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         { status: 403 }
       );
     }
-    console.log("isOwner", isOwner);
 
+ 
     switch (action) {
       case "createAgent":
         const agent = await createAgentByAgencyUserName(
@@ -75,7 +75,6 @@ async function isAgencyOwner(
         userName: agencyUserName,
       },
     });
-
     // Early return false if the agency doesn't exist
     if (!agency) return false;
 
@@ -104,8 +103,11 @@ async function createAgentByAgencyUserName(
   const { userName, aiModel, profile, categories } = data;
 
   try {
+
+    // implement later...
+    
     // Sign the OpenAI API key
-    const signedApiKey = await signOpenAIKey(aiModel.apiKey, userName);
+// const signedApiKey = await signOpenAIKey(aiModel.apiKey, userName);
 
     return await prisma.agent.create({
       data: {
@@ -119,7 +121,7 @@ async function createAgentByAgencyUserName(
           create: {
             llm: aiModel.llm,
             model: aiModel.model,
-            apiKey: signedApiKey, // Use the signed JWT instead of the raw API key
+            apiKey: ""
           },
         },
         profile: {
@@ -150,21 +152,3 @@ async function createAgentByAgencyUserName(
 }
 
 export { createAgentByAgencyUserName };
-
-function handleError(error: Error): NextResponse {
-  let statusCode: number;
-  switch (error.message) {
-    case "Unauthorized: User ID not found":
-      statusCode = 401;
-      break;
-    case "User not found":
-      statusCode = 404;
-      break;
-    case "Agent creation failed":
-      statusCode = 500;
-      break;
-    default:
-      statusCode = 500;
-  }
-  return NextResponse.json({ error: error.message }, { status: statusCode });
-}

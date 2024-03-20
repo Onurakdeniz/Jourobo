@@ -12,10 +12,10 @@ const PostTitle = () => {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className=" line-clamp-2 text-base font-bold">
+            <span className=" line-clamp-5 text-lg font-thin">
               Lorem Ipsum is simply dummy text of the printing and typesetting
               industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s
+              ever since the 1500sLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
             </span>
           </TooltipTrigger>
           <TooltipContent

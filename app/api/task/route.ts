@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { authMiddleware } from "@/lib/authMiddleware";
 import { CreateTaskSchema } from "@/schemas";
 import { createTaskByAgentUserName, isUserOwnerOfAgent } from "@/data/task";
+import { client } from "@/trigger";
 
 type CreateTaskData = z.infer<typeof CreateTaskSchema>;
 
@@ -36,7 +37,39 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Proceed to create task since user owns the agent
     const task = await createTaskByAgentUserName(parsedData, agentUserName);
+ 
 
+  /*
+if (task) {
+  const run = await createRunbyTaskId(task.id);
+
+  const send = await client.sendEvent({
+    name: "static-task",
+    timestamp: new Date(),
+    context: {
+      runId: run.id,
+      taskId: task.id,
+    },
+    payload: {
+      tempature: 25,  
+      outputStyle: "style", 
+      model: "model",  
+      promptMessage: {
+        role: "user", 
+        content: "ssds",
+      },
+      systemMessage: {
+        role: "system", 
+        content: "content"
+      },
+      source: {
+        sourceType: "type", 
+        ids: "nouns",
+      },
+    },
+  });
+}
+*/
     // Return a successful response
     return new NextResponse(JSON.stringify(task), {
       status: 200,
@@ -67,4 +100,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 }
 
+export async function createRunbyTaskId(taskId: string): Promise<any> {
+  try {
+    // Logic for creating a run related to a task
+    const run = await prisma.run.create({
+      data: {
+        status: "CREATED", // Setting the run's status to PENDING
+        taskId: taskId,
+      },
+    });
 
+    return run;
+  } catch (error) {
+    console.error("Error in creating run:", error);
+  }
+}

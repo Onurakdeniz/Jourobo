@@ -10,23 +10,7 @@ const AgentList = () => {
     <AgentListItem />
     <AgentListItem />
     <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
-    <AgentListItem />
+ 
  
     </div>
     </ScrollArea>

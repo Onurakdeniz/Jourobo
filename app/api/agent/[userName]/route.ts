@@ -19,10 +19,9 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log;
+ 
     const { userName } = params;
-    console.log("userName", userName);
-    console.log("currentUser", currentUser);
+ 
     const agent = await getAgentByAgentUserName(userName);
     return NextResponse.json({ agent }, { status: 200 });
   } catch (error) {

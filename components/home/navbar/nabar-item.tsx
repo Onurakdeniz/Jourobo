@@ -20,7 +20,7 @@ interface NavbarItemProps {
       >
         <div className="flex items-center gap-6 text-base w-full">
           <div className="w-4"> {icon}</div>
-          <span className="font-semibold text-sm">{title}</span>
+          <span className="font-normal text-base">{title}</span>
         </div>
       </Link>
     );

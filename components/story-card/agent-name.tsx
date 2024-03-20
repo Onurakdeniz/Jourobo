@@ -1,44 +1,97 @@
-import React from "react";
+"use client";
+import React, { useState , useEffect } from "react";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
+import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
+import { useFollowUnfollowMutation } from "@/hooks/useFollowAgent";
+import { Loader2 } from "lucide-react";
+import { useFollowStatus } from "@/hooks/useFollowStatus";
 
-type AgentNameProps = {
-  isNavbar?: boolean;
+const calculateTimeDifference = (dateString: any) => {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return null; // Or render some fallback UI
+  }
+  const timeDifference = formatDistanceToNow(date, { addSuffix: true });
+  return timeDifference.replace("about ", "");
 };
 
-const AgentName: React.FC<AgentNameProps> = ({ isNavbar = false }) => {
-  const className = isNavbar
-    ? "text-sm hover:cursor-pointer"
-    : "text-base hover:cursor-pointer";
+const AgentName = ({ agentValue, createdAt, isNavbar }) => {
+  let agentDate, storyDate;
+  if (agentValue) {
+    agentDate = calculateTimeDifference(agentValue.created);
+  }
+  if (createdAt) {
+    storyDate = calculateTimeDifference(createdAt);
+  }
+
+  const { data: followStatus, isLoading } = useFollowStatus(agentValue?.id);
+
+  const [isFollowed, setIsFollowed] = useState<boolean>(
+    followStatus?.isFollowing || false
+  );
+
+  useEffect(() => {
+    if (followStatus) {
+      setIsFollowed(followStatus.isFollowing);
+    }
+  }
+  , [followStatus]);
+
+
+  // Destructuring mutate function from the custom hook
+  const { mutate, isPending, isError, error } = useFollowUnfollowMutation();
+
+  // Handler for the follow/unfollow action
+  const handleFollowClick = () => {
+    // Determine the action based on current state
+    const action = isFollowed ? "unfollow" : "follow";
+
+    // Call the mutate function with the agentId and action
+    mutate(
+      { agentId: agentValue.id, action },
+      {
+        // onSuccess callback for updating UI based on successful mutation
+        onSuccess: () => {
+          setIsFollowed(!isFollowed);
+        },
+        // Optionally, you can handle errors or perform actions on error
+        onError: (error: Error) => {
+          console.error("Mutation error:", error.message);
+        },
+      }
+    );
+  };
 
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <div className="flex gap-1 items-center">
-          <Avatar className="h-5 w-5">
-            <AvatarFallback> sds </AvatarFallback>
-            <AvatarImage src="/ethereum.svg" />
+        <div className="flex gap-2 items-center">
+          <Avatar className="h-8 w-8 items-center">
+            <AvatarFallback className="font-bold uppercase ">
+              {agentValue?.profile?.name?.[0]}
+            </AvatarFallback>
+            <AvatarImage src={agentValue?.profile?.avatarUrl} />
           </Avatar>
-
-          <div className={className}>Daily Ethereum</div>
-          <div className="text-xs ml-1 text-muted-foreground">2h Ago</div>
+          <div className="capitalize cursor-pointer hover:text-primary/70">
+            {agentValue?.profile?.name}
+          </div>
+          <div className="text-xs ml-1 text-muted-foreground">{storyDate}</div>
         </div>
       </HoverCardTrigger>
-
       <HoverCardContent
         className="flex-col p-4 flex gap-4 justify-start w-[450px]"
         side="bottom"
@@ -47,30 +100,34 @@ const AgentName: React.FC<AgentNameProps> = ({ isNavbar = false }) => {
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             <Avatar className="h-5 w-5">
-              <AvatarFallback> AX </AvatarFallback>
+              <AvatarFallback></AvatarFallback>
               <AvatarImage src="/soty.png" />
             </Avatar>
-
-            <div className="text-sm hover:cursor-pointer ">Onur Akdeniz</div>
+            <Link href={`/agent/${agentValue?.userName}`}>
+              <div className="text-sm capitalize hover:cursor-pointer ">
+                {agentValue?.profile?.name}
+              </div>
+            </Link>
             <div>/</div>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="text-sm hover:cursor-pointer ">
-                    Nouns Agency
-                  </div>
+                  <Link href={`/agency/${agentValue?.agency?.userName}`}>
+                    <div className="text-sm hover:cursor-pointer ">
+                      {agentValue?.agency?.userName}
+                    </div>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Owner Agency</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="text-xs ml-1 text-muted-foreground  hover:cursor-pointer">
-                    40d Ago
+                  <div className="text-xs ml-1 text-muted-foreground hover:cursor-pointer">
+                    {agentDate}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -79,9 +136,20 @@ const AgentName: React.FC<AgentNameProps> = ({ isNavbar = false }) => {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <Button className="px-2 py-1 h-6">Follow</Button>
+          <Button
+            className="px-2 py-1 h-6"
+            onClick={handleFollowClick}
+            disabled={isPending}
+          >
+            {isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : isFollowed ? (
+              "Unfollow"
+            ) : (
+              "Follow"
+            )}
+          </Button>
         </div>
-
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
             <TooltipProvider>
@@ -100,58 +168,23 @@ const AgentName: React.FC<AgentNameProps> = ({ isNavbar = false }) => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
             <Badge variant="outline" className="rounded-none font-normal">
               {" "}
-              232 Followers
+              - Followers
             </Badge>
             <Badge variant="outline" className="rounded-none font-normal">
               {" "}
-              232 Stories
+              - Stories
             </Badge>
             <Badge variant="outline" className="rounded-none font-normal">
               {" "}
-              2322 Views
+              - Views
             </Badge>
           </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge variant="outline" className="rounded-none  ">
-                  5H
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Publish Period</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
-        <div className="flex gap-2 items-center">
-          <Badge
-            variant="category"
-            className="text-orange-600 border-orange-600"
-          >
-            Ethereum
-          </Badge>
-          <Badge
-            variant="category"
-            className="text-orange-600 border-orange-600"
-          >
-            Ethereum
-          </Badge>
-        </div>
-
         <div className="flex-col flex gap-2 ">
           <span className="text-xs font-bold"> Agent Description </span>
-          <span className="text-xs">
-            It has survived not only five centuries, but also the leap into
-            electronic typesetting, remaining essentially unchanged. It was
-            popularised in the 1960s with the release of Letraset sheets
-            containing Lorem Ipsum passages, and more recently with desktop
-            publishing software like Aldus PageMaker including versions of Lorem
-            Ipsum.
-          </span>
+          <span className="text-xs">{agentValue?.profile?.description}</span>
         </div>
       </HoverCardContent>
     </HoverCard>

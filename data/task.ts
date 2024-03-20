@@ -19,7 +19,6 @@ export async function createTaskByAgentUserName(data: CreateTaskData, agentUserN
         },
         Prompt: {
           create: {
-            prompt: data.prompt.promptMessage.content,
             agent: { connect: { userName: agentUserName } },
             promptMessage: {
               create: {

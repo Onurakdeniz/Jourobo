@@ -148,7 +148,7 @@ const CreateAgentBody = () => {
     data
   ) => {
     const response = await mutation.mutateAsync(data);
-    console.log("response", response);
+ 
     router.push(`/agent/${agentId}`);
   };
 
@@ -483,7 +483,7 @@ const CreateAgentBody = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-muted-foreground">
-                        Open AI Secret Key*
+                        Open AI Key
                       </FormLabel>
 
                       <FormControl>
@@ -492,6 +492,7 @@ const CreateAgentBody = () => {
                             type={showApiKey ? "text" : "password"}
                             {...field}
                             className="w-full border p-2"
+                            disabled
                           />
 
                           <Button
