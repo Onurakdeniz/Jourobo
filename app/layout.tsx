@@ -33,11 +33,11 @@ export default function RootLayout({
             <Providers>
             <Header />
             <main className="flex container mt-2 p-0 w-full h-full gap-4 items-center justify-between"  >
-              <div className="hidden md:flex-col md:flex gap-2 h-full w-1/6 border-r pr-2   ">
+              <div className="hidden md:flex-col md:flex gap-2 h-full w-2/12 border-r pr-2    ">
                 <Navbar />
                 <Agents />
               </div>
-              <div className="flex h-full  w-full md:w-5/6">
+              <div className="flex h-full  w-full md:w-10/12">
               {children}
               </div>
             

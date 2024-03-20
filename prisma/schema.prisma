@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())     @unique
+  id                String              @id @unique @default(uuid())
   privyUserId       String              @unique
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -179,13 +179,13 @@ model ProfileAgent {
 }
 
 model Source {
-  id              String     @id @default(uuid())
-  agentId         String
-  type            SourceType
-  ids             String[]
-  scrapperRunId   String
-  agent           Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  runs            Run        @relation(fields: [scrapperRunId], references: [id], onDelete: Cascade)
+  id            String     @id @default(uuid())
+  agentId       String
+  type          SourceType
+  ids           String[]
+  scrapperRunId String
+  agent         Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  runs          Run        @relation(fields: [scrapperRunId], references: [id], onDelete: Cascade)
 }
 
 model Category {
@@ -214,32 +214,72 @@ model Task {
 }
 
 model Run {
-  id        String      @id @default(uuid())
-  taskId    String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime?   @updatedAt
-  status    RunStatus   @default(PENDING)
-  Task      Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  story     Story?
-  sources   Source[]
-  cost      Float?
-  tokens    Float?
-  results   RunResult[]
+  id           String      @id @default(uuid())
+  eventId      String?
+  triggerRunId String?
+  taskId       String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?   @updatedAt
+  status       RunStatus   @default(CREATED)
+  Task         Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  story        Story?
+  sources      Source[]
+  cost         Float?
+  tokens       Float?
+  results      RunResult[]
 }
 
 model RunResult {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  run          Run      @relation(fields: [runId], references: [id])
-  runId        String
-  sourceOutput Json?
-  llmOutput    Json?
+  id         String       @id @default(uuid())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  run        Run          @relation(fields: [runId], references: [id])
+  runId      String
+  sourcePost SourcePost[]
+  llmOutput  LlmOutput[]
+}
+
+model SourcePost {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  content     String
+  likes       Int?
+  reCasts     Int?
+  output      Json
+  authorId    String
+  author      SourceAuthor @relation(fields: [authorId], references: [id])
+  runResultId String
+  runResult   RunResult    @relation(fields: [runResultId], references: [id])
+}
+
+model SourceAuthor {
+  id           String       @id @default(uuid())
+  fid          Int          @unique
+  createdAt    DateTime     @default(now())
+  userName     String
+  displayName  String
+  avatarUrl    String?      @db.VarChar(500)
+  followers    Int?
+  following    Int?
+  activeStatus String?
+  posts        SourcePost[]
+}
+
+model LlmOutput {
+  id              String    @id @default(uuid())
+  createdAt       DateTime  @default(now())
+  model           String
+  promptToken     Int?
+  completionToken Int?
+  content         String
+  runId           String
+  runResultId     String
+  runResult       RunResult @relation(fields: [runResultId], references: [id])
+  output          Json
 }
 
 model Prompt {
   id             String          @id @default(uuid())
-  prompt         String
   responseFormat Json?
   outputStyle    String?
   temperature    Float?
@@ -319,6 +359,7 @@ enum TaskState {
 }
 
 enum RunStatus {
+  CREATED
   CANCELLED
   PENDING
   RUNNING

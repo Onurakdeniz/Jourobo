@@ -9,10 +9,7 @@ const PostFeed = () => {
     <div className='flex-col flex gap-6'>
         <PostCard/>
         <PostCard/>
-        <PostCard/>
-        <PostCard/>
-        <PostCard/>
-        <PostCard/>
+         
 
     </div>
 </ScrollArea>

@@ -13,8 +13,8 @@ import { usePathname } from "next/navigation";
 
 const Agents = () => {
   const pathname = usePathname();
-  const showTrendingAgents = pathname === "/";
-  console.log(pathname, showTrendingAgents, "pathname");
+  const showTrendingAgents = pathname === "/feed";
+ 
 
   return (
     <>
@@ -40,7 +40,7 @@ const Agents = () => {
             <TabsContent value="trending" className="mt-4 ">
               <div className="h-6 flex gap-2 mb-4   justify-start items-center  ">
                 <Bot className="  " size={20} />
-                <span className=" "> All Trending Agents</span>
+                <span className="text-sm "> All Trending Agents</span>
               </div>
 
               <AgentList />

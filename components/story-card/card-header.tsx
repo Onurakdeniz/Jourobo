@@ -24,25 +24,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-
 import UserList from "./user-list";
 import AgentName from "./agent-name";
+import { StoryWithAll } from "@/schemas";
+import { z } from "zod";
 
-interface FeedCardHeaderProps {
-  isActive?: boolean;
-}
+type Story = z.infer<typeof StoryWithAll>;
+type Agent = Story['agent'];
 
+const CardHeader = ({ agent , createdAt }: {   agent : Agent , createdAt:Date }) => {
 
-const CardHeader: React.FC<FeedCardHeaderProps> = ({ isActive = false }) => {
   return (
     <div className={`flex items-center justify-between w-full border-b py-2  `}>
       <div className="flex-col w-8/12  flex">
         <div className="flex gap-2 items-center">
           <div className="flex-col flex ">
-            <AgentName />
+            <AgentName
+            agentValue = {agent}
+            createdAt = {createdAt}
+            />
           </div>
         </div>
-       
       </div>
 
       <div className="flex w-4/12 justify-end gap-3 items-center">
@@ -50,13 +52,13 @@ const CardHeader: React.FC<FeedCardHeaderProps> = ({ isActive = false }) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className=" flex gap-1 py-1 items-center px-2 text-xs  "
+                <div
+   
+                  className=" flex gap-1 py-1 items-center px-2 text-sm  "
                 >
                   <MessageCircle size={16} />
                   12
-                </Badge>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Used Post Count</p>

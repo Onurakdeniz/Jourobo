@@ -14,7 +14,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       },
     });
 
-    console.log("User exists:", user);
+ 
 
     if (user) {
       return new NextResponse(JSON.stringify({ available: false }), {

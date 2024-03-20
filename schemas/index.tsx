@@ -1,3 +1,8 @@
+
+
+///// NOTE REFACTORING REQUIRED  /////
+
+
 import { z, ZodRawShape, ZodSchema, ZodTypeAny } from "zod";
 // Enum Schemas
 
@@ -309,27 +314,25 @@ export const AgencySchema = BaseSchema.extend({
 
 // Extended Agency Schemas
 
-export const AgentbyAgency =z.object({
+export const AgentbyAgency = z.object({
   id: z.string(),
   createdAt: z.date(),
   userName: z.string(),
   categories: z.array(z.lazy(() => CategorySchema)).optional(),
   profile: z.lazy(() => ProfileAgentSchema),
-  viewCount : z.number().int(),
-  storyCount : z.number().int(),
-})
+  viewCount: z.number().int(),
+  storyCount: z.number().int(),
+});
 
-export const MidSchema  = AgencySchema.omit({
+export const MidSchema = AgencySchema.omit({
   agents: true,
 });
 
 export const getAgencySchema = MidSchema.extend({
   agentCount: z.number().optional(),
   totalStoryCount: z.number().optional(),
-  agents : z.array(z.lazy(() => AgentbyAgency)).optional(),
+  agents: z.array(z.lazy(() => AgentbyAgency)).optional(),
 });
-
-
 
 export const getAgencySchemawithCounts = AgencySchema.extend({
   totalStoryCount: z.number(),
@@ -350,8 +353,6 @@ export const EditAgencySchema = AgencySchema.pick({
   description: true,
   logo: true,
 });
-
- 
 
 // AI Model Schemas
 export const AIModelSchema = z.object({
@@ -442,26 +443,25 @@ export const PromptSchema: z.ZodType<Prompt> = BaseSchema.extend({
   LLMRun: z.array(z.lazy(() => LLMRunSchema)).optional(),
 });
 
-export const AgentSchema: z.ZodType<Agent> =z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  userName: z.string(),
-  aiModel: z.lazy(() => AIModelSchema),
-  aiModelId: z.string(),
-  categories: z.array(z.lazy(() => CategorySchema)).optional(),
-  sources: z.array(z.lazy(() => SourceSchema)).optional(),
-  tasks: z.array(z.lazy(() => TaskSchema)).optional(),
-  prompts: z.array(z.lazy(() => PromptSchema)).optional(),
-  stories: z.array(z.lazy(() => StorySchema)).optional(),
-  profileId: z.string(),
-  profile: z.lazy(() => ProfileAgentSchema),
-  follow: z.array(z.lazy(() => FollowSchema)),
-  points: z.array(z.lazy(() => PointSchema)),
-}).strict();
-
-
-
+export const AgentSchema: z.ZodType<Agent> = z
+  .object({
+    id: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    userName: z.string(),
+    aiModel: z.lazy(() => AIModelSchema),
+    aiModelId: z.string(),
+    categories: z.array(z.lazy(() => CategorySchema)).optional(),
+    sources: z.array(z.lazy(() => SourceSchema)).optional(),
+    tasks: z.array(z.lazy(() => TaskSchema)).optional(),
+    prompts: z.array(z.lazy(() => PromptSchema)).optional(),
+    stories: z.array(z.lazy(() => StorySchema)).optional(),
+    profileId: z.string(),
+    profile: z.lazy(() => ProfileAgentSchema),
+    follow: z.array(z.lazy(() => FollowSchema)),
+    points: z.array(z.lazy(() => PointSchema)),
+  })
+  .strict();
 
 export const getAgentByAgentUserNameSchema = z.object({
   createdAt: z.date(),
@@ -472,12 +472,13 @@ export const getAgentByAgentUserNameSchema = z.object({
   prompt: z.lazy(() => PromptSchema),
   tasks: z.array(z.lazy(() => TaskSchema)).optional(),
   updattedAt: z.date(),
-  storyCount : z.number().int(),
+  storyCount: z.number().int(),
   categories: z.array(z.lazy(() => CategorySchema)).optional(),
   profile: z.lazy(() => ProfileAgentSchema),
 });
 
 export const AIModelSchemaWithoutId = AIModelSchema.omit({
+  apiKey: true,
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -494,8 +495,6 @@ export const CreateAgentSchema = z.object({
   profile: z.lazy(() => ProfileAgentSchemaWithoutId),
   categories: z.string().array().optional(),
 });
-
- 
 
 export const getAgentSchema = z
   .object({
@@ -523,10 +522,64 @@ export const StorySchema: z.ZodType<Story> = BaseSchema.extend({
   points: z.array(PointSchema),
 });
 
+ 
 
+export const StoriesAgentProfileSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  avatarUrl: z.string(),
+  description: z.string(),
+  focus: z.string().nullable(),
+
+});
+
+
+
+export const StoriesAgentSchema = z.object({
+  id: z.string().uuid(),
+  agencyId: z.string().uuid(),
+  created: z.string().datetime(),
+  updated: z.string().datetime(),
+  userName: z.string(),
+  defaultAiModelId: z.string().nullable(),
+  profile: StoriesAgentProfileSchema,
+  totalViews: z.number(),
+});
+
+export const StoriesSoucePostAuthorSchema = z.object({
+  fid: z.string().uuid(),
+  avatarUrl: z.string().url(),
+  displayName: z.string(),
+  username: z.string(),
+  followers : z.number() ,
+  following : z.number() 
+});
+
+export const StoriesSourcePostSchema = z.object({
+  id: z.string().uuid(),
+  content: z.string(),
+  author: StoriesSoucePostAuthorSchema,
+  createdAt: z.string().datetime(),
+  likes:  z.number(), 
+  reCasts : z.number(),
+});
+
+export const StoryWithAll = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  content: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  agentId: z.string().uuid(),
+  tags: z.array(z.string()),
+  views: z.number(),
+  runId: z.string().uuid(),
+  votes:  z.number(),
+  agent: StoriesAgentSchema,
+  post : StoriesSourcePostSchema,
+});
 
 //////////////////////////////////////////////////////////////////////////////////////
-
 
 enum SourceType {
   FARCASTER_USER = "FARCASTER_USER",

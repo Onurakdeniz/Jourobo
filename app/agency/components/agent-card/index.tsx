@@ -16,7 +16,7 @@ import { z } from "zod";
 type getAgent = z.infer<typeof getAgentSchema>;
 
 const AgentCard = ({ agent }: { agent: any }) => {
-  console.log(agent,"agent");
+ 
   return (
     <div className="flex gap-4 w-full border h-32 px-6 py-4 items-center justify-between rounded-lg">
       <AgentInfo

@@ -134,8 +134,8 @@ const PostsStat = () => {
         </DropdownMenu>
       </div>
       <div className="flex gap-2 items-center pt-2">
-        <Badge variant="category" className="text-orange-600 border-orange-600">
-          Ethereum
+        <Badge variant="category"  className="text-orange-600 font-bold border-orange-600">
+          Posts from Nouns Channel
         </Badge>
       </div>
     </div>

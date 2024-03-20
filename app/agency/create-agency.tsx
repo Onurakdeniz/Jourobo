@@ -19,6 +19,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Input } from "@/components/ui/input";
 import { CircleCheck } from "lucide-react";
 import { CreateAgencySchema } from "@/schemas";
+import { useFetchAgencies } from "@/hooks/useFetchAgencies";
 
 interface CreateAgencyProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -32,7 +33,9 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
   const { watch, setError, clearErrors } = form;
   const userName = watch("userName");
 
-  console.log("userNamed:", userName);
+  const { refetch } = useFetchAgencies()
+
+ 
 
   const [usernameAvailable, setUsernameAvailable] = useState(true);
 
@@ -62,7 +65,7 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
     if (userName && userName.length > 0) {
       const delayDebounceFn = setTimeout(async () => {
         const available = await checkUsernameAvailability(userName);
-        console.log("username available:", available);
+ 
         setUsernameAvailable(available);
         if (!available) {
           setError("userName", {
@@ -93,7 +96,7 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
       return; // Prevent form submission if username is not available
     }
     try {
-      console.log("datafoto", data);
+ 
       const requestBody = {
         data,
         action: "create",
@@ -107,7 +110,7 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
         body: JSON.stringify(requestBody),
       });
 
-      console.log("moyooo", response);
+ 
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -123,10 +126,11 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
           onClick: () => console.log("Undo"),
         },
       });
-
-      router.push(`/agency/${res.agency.userName}`);
+      refetch()
+     //router.push(`/agency/${res.agency.userName}`);
+      
       setOpen(false);
-      console.log("res:", res);
+ 
     } catch (error: any) {
       console.error("Failed to create agency:", error);
       toast.error(error.message || "Failed to create agency");

@@ -49,6 +49,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useAgencyStore } from "@/store/agency";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useFetchAgent } from "@/hooks/useFetchAgent";
+import { useFetchAgencies } from "@/hooks/useFetchAgencies";
 
 export const companies = ["OpenAI", "Anthropic", "Gemini"];
 
@@ -64,6 +66,9 @@ const CreateAgentBody = () => {
   const form = useForm<z.infer<typeof CreateAgentSchema>>({
     resolver: zodResolver(CreateAgentSchema),
   });
+
+  const { refetch } = useFetchAgencies()
+
 
   const {
     handleSubmit,
@@ -89,8 +94,7 @@ const CreateAgentBody = () => {
       body: JSON.stringify({ username }),
     });
 
-    console.log("username", username)
-    console.log("response", response);
+     
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -109,7 +113,6 @@ const CreateAgentBody = () => {
     if (userName && userName.length > 0) {
       const delayDebounceFn = setTimeout(async () => {
         const available = await checkUsernameAvailability(userName);
-        console.log("username available:", available);
         setUsernameAvailable(available);
         if (!available) {
           setError("userName", {
@@ -161,10 +164,12 @@ const CreateAgentBody = () => {
       toast.error("Username is already taken.");
       return; // Prevent form submission if username is not available
     }
-    console.log(data);
+ 
     const response = await mutation.mutateAsync(data);
-    console.log("response", response);
+ 
+    refetch();
     router.push(`/agency/${agencyId}`);
+
   };
 
   return (
@@ -430,37 +435,7 @@ const CreateAgentBody = () => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="aiModel.apiKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Open AI Secret Key*</FormLabel>
-
-                      <FormControl>
-                        <div className="flex w-full gap-6 items-center">
-                          <Input
-                            type={showApiKey ? "text" : "password"}
-                            {...field}
-                            className="w-full border p-2"
-                          />
-
-                          <Button
-                            variant="outline"
-                            onClick={() => setShowApiKey(!showApiKey)}
-                          >
-                            {showApiKey ? "Hide API Key" : "Show API Key"}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      {errors.aiModel?.apiKey && (
-                        <FormMessage className="text-red-500">
-                          {errors.aiModel.apiKey.message}
-                        </FormMessage>
-                      )}
-                    </FormItem>
-                  )}
-                />
+            
               </div>
               <Button
                 type="submit"

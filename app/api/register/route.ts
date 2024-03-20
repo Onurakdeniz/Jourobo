@@ -35,8 +35,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     const userData = sdkResponse.data;
-    console.log(userData, "userData");
-
+ 
     const user = await upsertUserWithRelations(userData, privyUser.id);
 
     return new NextResponse(JSON.stringify({ user }), {

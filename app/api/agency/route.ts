@@ -13,7 +13,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return currentUser;
     }
     const agencies = await getAgenciesByUserId(currentUser.id);
-    console.log("agenciesef", agencies);
+ 
     return NextResponse.json({ agencies }, { status: 200 });
   } catch (error) {
     console.error(`GET request failed with error: ${error}.`);
@@ -36,9 +36,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (currentUser instanceof NextResponse) {
       return currentUser;
     }
-    console.log("ididid", action);
-    console.log("currentUseraaaaaa", currentUser);
-    console.log("datamota", data);
+ 
     const agency = await upsertAgency(data, currentUser.id, action, id);
     return NextResponse.json({ agency }, { status: 200 });
   } catch (error) {

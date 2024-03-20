@@ -17,7 +17,7 @@ export const useFetchTasks = () => {
       throw new Error("Agent not found !");
     }
     const data = await response.json();
-    console.log("moraa", data);
+ 
     return data.tasks;
   }
 
@@ -38,7 +38,7 @@ export const useFetchTasks = () => {
     setTasks(tasks);
   }
 
- console.log("tasks", tasks);
+ 
 
   return { newTasks, isLoading, error, refetch };
 };
