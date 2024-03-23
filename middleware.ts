@@ -16,6 +16,9 @@ export async function middleware(request: NextRequest) {
   // Check if the current path is one of the noAuthRedirectPaths
   const shouldSkipAuthRedirect = noAuthRedirectPaths.some(path => pathname.startsWith(path));
 
+  const allCookies = request.cookies.getAll();
+console.log("All Cookies", allCookies);
+
   // Attempt to get the access token
   const accessToken = request.cookies.get("privy-token");
   console.log("Access Token", accessToken);
