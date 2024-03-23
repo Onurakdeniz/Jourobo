@@ -1,6 +1,6 @@
 "use client";
-import React, { CSSProperties, useEffect ,Suspense } from "react";
- 
+import React, { CSSProperties, useEffect, Suspense } from "react";
+
 import FeedTop from "./top";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import FeedContent from "./feed-content";
@@ -18,28 +18,24 @@ const override: CSSProperties = {
   borderColor: "red",
 };
 
- 
-
 const Feed = () => {
   const [currentTab, setCurrentTab] = React.useState("trending");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  
+ 
+
   const changeTab = (tab: string) => {
     setCurrentTab(tab);
- 
   };
 
   const { storiesState, isLoading, error, refetch } =
     useFetchStories(currentTab);
 
-  
-    useEffect(() => {
-      if (storiesState.length > 0) {
-        router.push(`feed/?id=${storiesState[0].id}`);
-      }
-    }, [storiesState]);
-  
+  useEffect(() => {
+    if (storiesState.length > 0) {
+      router.push(`feed/?id=${storiesState[0].id}`);
+    }
+  }, [storiesState]);
+
   return (
     <div className="flex flex-col w-full">
       <Tabs

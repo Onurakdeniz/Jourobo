@@ -1,6 +1,7 @@
 'use client'
 
 import React from "react";
+import { Suspense } from "react";
 import PostTop from "./post-top";
 import PostFeed from "./posts-feed";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -20,7 +21,9 @@ const Posts = () => {
       <Tabs defaultValue="posts" className=" h-full">
         <PostTop />
         <TabsContent value="posts" className="mt-2 flex-col flex gap-2 ">
+          <Suspense>
           <PostFeed />
+          </Suspense>
         </TabsContent>
         <TabsContent value="comments"></TabsContent>
       </Tabs>

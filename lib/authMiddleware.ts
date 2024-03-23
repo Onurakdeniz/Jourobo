@@ -6,10 +6,12 @@ import { cookies } from "next/headers";
 export async function authMiddleware(req: NextRequest) {
   try {
     const privyUserId = cookies().get("x-user-id")?.value;
- 
     if (!privyUserId) {
       console.error("Unauthorized: User ID not found");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return new NextResponse(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const currentUser = await prisma.user.findUnique({
@@ -19,13 +21,18 @@ export async function authMiddleware(req: NextRequest) {
 
     if (!currentUser) {
       console.error("User not found");
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return new NextResponse(
+        JSON.stringify({ error: "User not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     return currentUser;
   } catch (error) {
     console.error("Error in authMiddleware", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
- 
