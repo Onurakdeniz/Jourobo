@@ -18,13 +18,7 @@ const override: CSSProperties = {
   borderColor: "red",
 };
 
-
-const override: CSSProperties = {
-  display: "block",
-  margin: "0 auto",
-  borderColor: "red",
-};
-
+ 
 
 const Feed = () => {
   const [currentTab, setCurrentTab] = React.useState("trending");
