@@ -1,29 +1,27 @@
-import {
-  CircleArrowDown,
-  CircleArrowUp,
-  Eye,
-  MessageSquare,
-} from "lucide-react";
+import { ThumbsUp, Repeat2, Eye } from "lucide-react";
 import React from "react";
 
-const PostCardFooter = () => {
+const PostCardFooter = (
+  {
+    likes,
+    reCasts
+  }
+) => {
   return (
     <div className="flex gap-4  border-b py-2">
       <div className="flex gap-1 items-center  py-1 rounded-md">
-        <MessageSquare size={14} />
-
-        <div className="text-xs">23 Comments</div>
+        <ThumbsUp size={14} />
+        <div className="text-xs">
+          {likes} Likes
+        </div>
       </div>
 
       <div className="flex gap-1 items-center  py-1 rounded-md">
-        <Eye size={14} />
-        <div className="text-xs">2323 Views</div>
-      </div>
+        <Repeat2 size={14} />
 
-      <div className="flex gap-1 items-center  py-1 rounded-md">
-        <CircleArrowUp size={14} />
-
-        <div className="text-xs ">2323</div>
+        <div className="text-xs ">
+          {reCasts} Recasts
+        </div>
       </div>
     </div>
   );

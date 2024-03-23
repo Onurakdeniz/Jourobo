@@ -24,25 +24,38 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import UserList from "./user-list";
+import  {UserList} from "./user-list";
 import AgentName from "./agent-name";
 import { StoryWithAll } from "@/schemas";
 import { z } from "zod";
+ 
 
 type Story = z.infer<typeof StoryWithAll>;
-type Agent = Story['agent'];
+type Agent = Story["agent"];
 
-const CardHeader = ({ agent , createdAt }: {   agent : Agent , createdAt:Date }) => {
+const CardHeader = ({
+  agent,
+  createdAt,
+  postNumbers,
+  postAuthors,
+ 
+}: {
+  agent: Agent;
+  createdAt: Date;
+  postNumbers: number;
+  postAuthors: any;
+ 
+}) => {
+  console.log(postAuthors, "postAuthors");
+  const sortedAuthors = postAuthors.sort((a, b) => b.followers - a.followers);
 
+  const topAuthors = sortedAuthors.slice(0, 4);
   return (
-    <div className={`flex items-center justify-between w-full border-b py-2  `}>
+    <div className={`flex flex-1 items-center justify-between w-full   border-b py-2  `}>
       <div className="flex-col w-8/12  flex">
         <div className="flex gap-2 items-center">
           <div className="flex-col flex ">
-            <AgentName
-            agentValue = {agent}
-            createdAt = {createdAt}
-            />
+            <AgentName agentValue={agent} createdAt={createdAt} />
           </div>
         </div>
       </div>
@@ -52,12 +65,9 @@ const CardHeader = ({ agent , createdAt }: {   agent : Agent , createdAt:Date })
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div
-   
-                  className=" flex gap-1 py-1 items-center px-2 text-sm  "
-                >
+                <div className=" flex gap-1 py-1 items-center px-2 text-sm  ">
                   <MessageCircle size={16} />
-                  12
+                  <span className="text-xs">{postNumbers}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -73,25 +83,14 @@ const CardHeader = ({ agent , createdAt }: {   agent : Agent , createdAt:Date })
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex -space-x-3 rtl:space-x-reverse">
-                    <Avatar className="w-6 h-6  border-2">
-                      <AvatarImage src="/toady.jpg" alt="avatar" />
-                      <AvatarFallback className="text-xs">OA</AvatarFallback>
-                    </Avatar>
-
-                    <Avatar className="w-6 h-6 border-2">
-                      <AvatarImage src="/mody.jpg" alt="avatar" />
-                      <AvatarFallback className="text-xs">OA</AvatarFallback>
-                    </Avatar>
-
-                    <Avatar className="w-6 h-6  border-2">
-                      <AvatarImage src="/toady.jpg" alt="avatar" />
-                      <AvatarFallback className="text-xs">OA</AvatarFallback>
-                    </Avatar>
-
-                    <Avatar className="w-6 h-6  border-2">
-                      <AvatarImage src="/soty.png" alt="avatar" />
-                      <AvatarFallback className="text-xs">OA</AvatarFallback>
-                    </Avatar>
+                    {topAuthors.map((author, index) => (
+                      <Avatar key={index} className="w-6 h-6  border-2">
+                        <AvatarImage src={author.avatarUrl} alt="avatar" />
+                        <AvatarFallback className="text-xs">
+                          {author.userName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -108,7 +107,7 @@ const CardHeader = ({ agent , createdAt }: {   agent : Agent , createdAt:Date })
             sideOffset={15}
             alignOffset={0}
           >
-            <UserList />
+            <UserList authors={postAuthors} />
           </DropdownMenuContent>
         </DropdownMenu>
 

@@ -20,7 +20,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     const agentUserName = data.agentId;
-
     const userOwnsAgent = await isUserOwnerOfAgent(
       currentUser.id,
       agentUserName
@@ -37,46 +36,52 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Proceed to create task since user owns the agent
     const task = await createTaskByAgentUserName(parsedData, agentUserName);
- 
+    if (task) {
+      // Assuming agentId and starterAgentId are available or retrieved from somewhere
+      const story = await createStory(task.agentId, task.starterAgentId);
+      const run = await createRunbyTaskIdAndStoryId(task.id, story.id);
 
-  /*
-if (task) {
-  const run = await createRunbyTaskId(task.id);
+      const payload = {
+        openAIRequest: {
+          model: " ",
+          promptMessage: {
+            role: "user",
+            content: "ssds",
+          },
+          systemMessage: {
+            role: "system",
+            content: "content",
+          },
+          toolChoice: "", // Specify the tool choice here
+          tools: [], // Specify any tools here if needed
+        },
+        source: {
+          SourceType: "FARCASTER_CHANNEL",
+          ids: "base",
+          amount: 15,
+          withRecasts: true,
+        },
+      };
 
-  const send = await client.sendEvent({
-    name: "static-task",
-    timestamp: new Date(),
-    context: {
-      runId: run.id,
-      taskId: task.id,
-    },
-    payload: {
-      tempature: 25,  
-      outputStyle: "style", 
-      model: "model",  
-      promptMessage: {
-        role: "user", 
-        content: "ssds",
-      },
-      systemMessage: {
-        role: "system", 
-        content: "content"
-      },
-      source: {
-        sourceType: "type", 
-        ids: "nouns",
-      },
-    },
-  });
-}
-*/
-    // Return a successful response
-    return new NextResponse(JSON.stringify(task), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      const send = await client.sendEvent({
+        name: "static-task",
+        timestamp: new Date(),
+        context: {
+          runId: run.id,
+          taskId: task.id,
+          storyId: story.id,
+        },
+        payload: payload,
+      });
+
+      // Return a successful response
+      return new NextResponse(JSON.stringify(task), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
   } catch (error) {
     console.error("Error handling POST request:", error);
     let errorMessage = "An error occurred";
@@ -100,18 +105,19 @@ if (task) {
   }
 }
 
-export async function createRunbyTaskId(taskId: string): Promise<any> {
+ async function createRunbyTaskId(taskId: string): Promise<any> {
   try {
     // Logic for creating a run related to a task
     const run = await prisma.run.create({
       data: {
-        status: "CREATED", // Setting the run's status to PENDING
+        status: "CREATED",
         taskId: taskId,
+        storyId: storyId, // Link the run to the created story
       },
     });
-
     return run;
   } catch (error) {
     console.error("Error in creating run:", error);
+    throw error; // Rethrow to handle it in the calling function
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 import { useStoryStore } from "@/store/story";
-import { useSearchParams } from "next/navigation";
+ 
 
 export const useFetchStories = (sortType: string) => {
   const storiesState = useStoryStore((state) => state.stories);

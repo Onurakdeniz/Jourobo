@@ -226,7 +226,7 @@ async function getAgenciesByUserId(userId: string): Promise<any> {
       const agentsWithStoryCount = await Promise.all(
         agency.agents.map(async (agent) => {
           const stories = await prisma.story.findMany({
-            where: { agentId: agent.id },
+            where: { authorId: agent.id },
           });
 
           const task = await prisma.task.findMany({

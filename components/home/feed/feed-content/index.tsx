@@ -13,7 +13,7 @@ const FeedContent = (
   { stories } : { stories: Story[] }
 ) => {
   return (
-    <ScrollArea className='flex   mt-4 items-center gap-2 overflow-auto pr-4' style={{ height: 'calc(100vh - 120px)' }}>
+    <ScrollArea className='flex   mt-4 items-center gap-2 overflow-auto pr-4  ' style={{ height: 'calc(100vh - 120px)' }}>
       <div className='flex-col flex w-full gap-10'> 
         {stories.map((story : any, index :number) => (
           <FeedCard key={index} story={story}  />

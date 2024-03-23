@@ -1,68 +1,54 @@
 import { privy } from "@/lib/privy";
 import { NextRequest, NextResponse } from "next/server";
 
-// Define the middleware function
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === "/api/register") {
-    return NextResponse.next();
-  }
+  const { pathname } = request.nextUrl;
 
-  if (request.nextUrl.pathname === "/feed") {
-    // Check if the user is authenticated
-    const accessToken = request.cookies.get("privy-token");
-    if (!accessToken) {
-      // Redirect to the login page if not authenticated
-      const loginUrl = new URL("/login", request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-    // If authenticated, allow access to the "/feed" path
-    return NextResponse.next();
-  }
+  // Paths that should not redirect authenticated users to /feed
+  const noAuthRedirectPaths = [
+    '/api/register',
+    '/api/trigger',
+    '/_next/static',
+    '/_next/image',
+    '/favicon.ico',
+  ];
 
-  if (request.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/feed", request.url));
-  }
+  // Check if the current path is one of the noAuthRedirectPaths
+  const shouldSkipAuthRedirect = noAuthRedirectPaths.some(path => pathname.startsWith(path));
 
-  if (request.method === "POST") {
-    const requestBody = await request.json();
-  }
-
+  // Attempt to get the access token
   const accessToken = request.cookies.get("privy-token");
-   
 
-  try {
-    const verifiedClaims = await privy.verifyAuthToken(accessToken.value);
-    const userId = verifiedClaims.userId;
-    const privyUser = await privy.getUser(userId);
-    const privyUserId = privyUser.id;
-    const response = NextResponse.next();
-    response.cookies.set("x-user-id", privyUserId);
-    response.cookies.set({
-      name: "x-user-id",
-      value: privyUserId,
-      path: "/",
-    });
-    return response;
-  } catch (error) {
-    console.error(error);
-    // Unauthorized: Invalid or expired access token
-    // Redirect to the login page
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+  // If the user is on the login page or the home page and has a valid access token, redirect them to /feed
+  if ((pathname === "/login" || pathname === "/") && accessToken) {
+    try {
+      // Verify the access token
+      await privy.verifyAuthToken(accessToken.value);
+      // If the token is valid, redirect to /feed
+      return NextResponse.redirect(new URL("/feed", request.url));
+    } catch (error) {
+      // If the token is invalid, do nothing and allow access to the login or home page
+      console.error(error);
+    }
   }
+
+  // Specific logic for /api/register path
+  if (pathname === "/api/register") {
+    return NextResponse.next();
+  }
+
+  // Specific logic for /feed path
+  if (pathname === "/feed" && !accessToken) {
+    // Redirect to the login page if not authenticated
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Default behavior for other paths
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api/register
-     * - api/triggers
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - login (login page)
-     */
-    "/((?!api/register|api/trigger|_next/static|_next/image|favicon.ico|login).*)",
+    "/((?!api/register|api/trigger|_next/static|_next/image|favicon.ico).*)",
   ],
 };

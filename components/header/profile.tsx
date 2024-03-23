@@ -15,13 +15,16 @@ import { ModeToggle } from "../theme-toggle";
 import { usePrivy, useLogin } from "@privy-io/react-auth";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
+  const router = useRouter();
   const { ready, authenticated, user, getAccessToken, isModalOpen, logout } =
     usePrivy();
 
   const displayName = user?.farcaster?.displayName || "User";
 
+  // to get updated user data
   const { login } = useLogin({
     onComplete: async (user, isNewUser) => {
       await fetch("/api/register", { method: "POST" });
@@ -33,6 +36,12 @@ const Profile = () => {
   if (!ready) {
     return     <Skeleton className=" flex items-center mt-3 h-5 w-[160px]" />
   }
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  }
+
  
   return (
     <>
@@ -64,7 +73,7 @@ const Profile = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
           
-              <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

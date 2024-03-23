@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "@/lib/authMiddleware";
+import { Prisma } from "@prisma/client";
 
 // GET Handler
 export async function GET(req: NextRequest): Promise<NextResponse> {
@@ -10,24 +11,29 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return currentUser;
     }
 
+    // Pagination setup
+    const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
+    const pageSize = 30; // Items per page
+    const skip = (page - 1) * pageSize;
     const sort = req.nextUrl.searchParams.get("sort");
-    let orderBy;
-    if (sort === "trending") {
-      orderBy = { /* Your logic here to handle trending without direct _count usage */ };
-    } else {
-      orderBy = [{ createdAt: 'desc' }];
-    }
 
+    let orderBy: Prisma.StoryOrderByWithRelationInput[];
+    if (sort === "trending") {
+      orderBy = [{ votes: { _count: { _asc: Prisma.SortOrder.DESC } } }];
+    } else {
+      orderBy = [{ createdAt: Prisma.SortOrder.DESC }];
+    }
+    
     const stories = await prisma.story.findMany({
-      orderBy: orderBy,
+      skip,
+      take: pageSize,
       include: {
-        agent: {
+        author: {
           include: {
             profile: true,
-            agency: true,
           },
         },
-        run: {
+        runs: {
           include: {
             results: {
               include: {
@@ -36,31 +42,49 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
                     author: true,
                   },
                 },
+                LLMResponse: {
+                  include: {
+                    content: {
+                      include: {
+                        categories: {
+                          include: {
+                            category: true,
+                          },
+                        },
+                        tags: {
+                          include: {
+                            tag: true,
+                          },
+                        },
+                        annotations: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
+        votes: true,
+        _count: {
+          select: {
+            bookmarks: true,
+            votes: true,
+          },
+        },
       },
     });
-
-    // Assuming you need to fetch counts for bookmarks and votes separately
-    const updatedStories = await Promise.all(stories.map(async (story) => {
-      const bookmarksCount = await prisma.bookmark.count({
-        where: { storyId: story.id },
-      });
-      const votesCount = await prisma.vote.count({
-        where: { storyId: story.id },
-      });
-
-      // Add bookmarks and votes counts directly to the story object
-      return {
-        ...story,
-        bookmarks: bookmarksCount,
-        votes: votesCount,
-      };
-    }));
-
-    return new NextResponse(JSON.stringify(updatedStories), {
+    
+    // Sort stories based on the vote count
+    let sortedStories;
+    if (sort === "trending") {
+      sortedStories = stories.sort((a, b) => b._count.votes - a._count.votes);
+    } else {
+      sortedStories = stories.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    
+    // Return the sorted stories
+    return new NextResponse(JSON.stringify(sortedStories), {
       status: 200,
       headers: {
         "Content-Type": "application/json",

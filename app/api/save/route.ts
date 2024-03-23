@@ -21,36 +21,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing storyId" }, { status: 400 });
     }
 
-    // Check if a bookmark already exists
-    const existingBookmark = await prisma.bookmark.findFirst({
+    // Check if a vote already exists for this story by the current user
+    const existingVote = await prisma.vote.findFirst({
       where: {
         userId: currentUser.id,
         storyId: storyId,
       },
     });
 
-    if (existingBookmark) {
-      // If a bookmark exists, toggle its 'bookmarked' status
-      const updatedBookmark = await prisma.bookmark.update({
+    // If a vote doesn't exist, we proceed to check the bookmark status
+    if (!existingVote) {
+      const existingBookmark = await prisma.bookmark.findFirst({
         where: {
-          id: existingBookmark.id,
-        },
-        data: {
-          bookmarked: !existingBookmark.bookmarked,
-        },
-      });
-      const action = updatedBookmark.bookmarked ? "saved" : "unsaved";
-      return NextResponse.json({ message: `Story ${action} successfully`, bookmark: updatedBookmark }, { status: 200 });
-    } else {
-      // If no bookmark exists, create a new one with 'bookmarked' set to true
-      const newBookmark = await prisma.bookmark.create({
-        data: {
           userId: currentUser.id,
           storyId: storyId,
-          bookmarked: true,
         },
       });
-      return NextResponse.json({ message: "Story saved successfully", bookmark: newBookmark }, { status: 200 });
+
+      if (existingBookmark) {
+        // If a bookmark exists, toggle its 'bookmarked' status
+        const updatedBookmark = await prisma.bookmark.update({
+          where: {
+            id: existingBookmark.id,
+          },
+          data: {
+            bookmarked: !existingBookmark.bookmarked,
+          },
+        });
+        const action = updatedBookmark.bookmarked ? "saved" : "unsaved";
+        return NextResponse.json({ message: `Story ${action} successfully`, bookmark: updatedBookmark }, { status: 200 });
+      } else {
+        // If no bookmark exists, create a new one with 'bookmarked' set to true
+        const newBookmark = await prisma.bookmark.create({
+          data: {
+            userId: currentUser.id,
+            storyId: storyId,
+            bookmarked: true,
+          },
+        });
+        return NextResponse.json({ message: "Story saved successfully", bookmark: newBookmark }, { status: 200 });
+      }
+    } else {
+      // If a vote exists, we don't allow toggling the bookmark status
+      return NextResponse.json({ error: "Cannot toggle bookmark status after voting" }, { status: 403 });
     }
   } catch (error) {
     console.error('Failed to toggle save/unsave story:', error);

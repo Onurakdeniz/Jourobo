@@ -1,40 +1,46 @@
-import React, { useEffect, useState } from "react";
-import { useSaveStatus } from "@/hooks/useSaveStatus";
-import { useSaveMutation } from "@/hooks/useSaveMutation";
-import { Eye, CircleArrowDown, CircleArrowUp, Bookmark } from "lucide-react";
+import React, { useState } from "react";
+import { useVoteMutation    } from "@/hooks/useVoteMutation";  
+import { useSaveMutation   } from "@/hooks/useSaveMutation";  
+import { useVoteStatus     } from "@/hooks/useVoteStatus";
+import { useSaveStatus     } from "@/hooks/useSaveStatus";
+import {
+  Eye,
+  CircleArrowDown,
+  CircleArrowUp,
+  Bookmark,
+  Loader2,
+  BookmarkCheck,
+} from "lucide-react";
 import { Button } from "../ui/button";
 
-const CardFooter = ({
-  storyId, // Assuming you pass the storyId as a prop to CardFooter
-  vote,
-  bookMarks,
-  views,
-}) => {
-  const { data: saveStatus, refetch } = useSaveStatus(storyId);
-  const { mutate: toggleSave } = useSaveMutation();
+const CardFooter = ({ storyId, views }) => {
+  const { data: voteStatus, refetch: refetchVoteStatus } = useVoteStatus(storyId);
+  const { mutate: toggleVote, isPending: isVotePending } = useVoteMutation();
 
-  // State to manage local bookmark count, to avoid immediate re-fetching after toggling
-  const [localBookmarks, setLocalBookmarks] = useState(bookMarks);
+  const { data: saveStatus, refetch: refetchSaveStatus } = useSaveStatus(storyId);
+  const { mutate: toggleSave, isPending: isSavePending } = useSaveMutation();
 
-  // Effect to update local state when bookmark status is fetched
-  
+  const [localBookmarks, setLocalBookmarks] = useState(0); // Example initial state
+
+  const handleVote = (voteAction:any) => {
+    toggleVote(
+      { storyId, voteAction },
+      {
+        onSuccess: () => {
+          refetchVoteStatus();
+        },
+      }
+    );
+  };
 
   const handleBookmarkToggle = () => {
-    const action = saveStatus?.isBookmarked ? "unsave" : "save";
+    const action = saveStatus?.isSaved ? "unsave" : "save";
     toggleSave(
       { storyId, action },
       {
         onSuccess: () => {
-          // Refetch the bookmark status after toggling
-          refetch();
-          // Adjust the local bookmark count based on the action performed
-          if (action === "save") {
-            // If saving, set the bookmark count to 1
-            setLocalBookmarks(1);
-          } else {
-            // If unsaving, set the bookmark count to 0
-            setLocalBookmarks(0);
-          }
+          refetchSaveStatus();
+          setLocalBookmarks((prev) => (action === "save" ? prev + 1 : Math.max(0, prev - 1)));
         },
       }
     );
@@ -42,38 +48,53 @@ const CardFooter = ({
 
   return (
     <div className="flex gap-2">
-      {/* Other parts of the component remain unchanged */}
-      <div className="flex gap-1 items-center border px-2 py-1 bg-primary/5 rounded-full">
-        <Button variant="ghost" size="sm" className="h-6 px-1" onClick={handleBookmarkToggle}>
-          <Bookmark size={16} />
+      <div className="flex gap-1 items-center border px-1 py-1 bg-primary/5 rounded-full">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6"
+          onClick={() => handleVote(voteStatus?.voteStatus === 'DOWN' ? 'NONE' : 'DOWN')}
+          disabled={isVotePending}
+        >
+          <CircleArrowDown size={16} />
         </Button>
-        <div className="text-xs flex gap-1 items-center">
-          {localBookmarks}
+
+        <div className="text-xs font-bold">
+          {/* Display the current vote status or count here */}
+          {voteStatus?.voteStatus}
         </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6"
+          onClick={() => handleVote(voteStatus?.voteStatus === 'UP' ? 'NONE' : 'UP')}
+          disabled={isVotePending}
+        >
+          <CircleArrowUp size={16} />
+        </Button>
+      </div>
+
+      <div className="flex gap-1 items-center border px-2 py-1 bg-primary/5 rounded-full">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 px-1"
+          onClick={handleBookmarkToggle}
+          disabled={isSavePending}
+        >
+          {isSavePending ? (
+            <Loader2 className="animate-spin" size={16} />
+          ) : saveStatus?.isSaved ? (
+            <BookmarkCheck size={16} />
+          ) : (
+            <Bookmark size={16} />
+          )}
+        </Button>
+        <div className="text-xs flex gap-1 items-center">{localBookmarks}</div>
       </div>
     </div>
   );
 };
 
 export default CardFooter;
-
-/*
-  <div className="flex gap-1 items-center border px-1 py-1 bg-primary/5 rounded-full">
-    <Button variant="ghost" size="sm" className="h-6">
-      <CircleArrowDown size={16} />
-    </Button>
-
-    <div className="text-xs font-bold">
-      {vote}
-    </div>
-    <Button variant="ghost" size="sm" className="h-6">
-      <CircleArrowUp size={16} />
-    </Button>
-  </div>
-*/
-
-// Implementation: This part of the code was responsible for rendering the voting buttons and the vote count.
-// The vote count is displayed between the downvote and upvote buttons.
-// Each button is rendered using the Button component with the 'ghost' variant and 'sm' size.
-// The downvote button has a CircleArrowDown icon and the upvote button has a CircleArrowUp icon.
-// The vote count is rendered inside a div with the 'text-xs font-bold' classes.
