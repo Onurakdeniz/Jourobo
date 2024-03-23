@@ -127,7 +127,8 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
         },
       });
       refetch()
-     //router.push(`/agency/${res.agency.userName}`);
+      router.push(`/agency/${res.agency.userName}`);
+      router.refresh();
       
       setOpen(false);
  

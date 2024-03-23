@@ -575,7 +575,7 @@ export const StoryWithAll = z.object({
   views: z.number(),
   runId: z.string().uuid(),
   votes:  z.number(),
-  agent: StoriesAgentSchema,
+  author: StoriesAgentSchema,
   post : StoriesSourcePostSchema,
 });
 

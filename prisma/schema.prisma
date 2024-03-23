@@ -148,24 +148,25 @@ model AIModel {
 }
 
 model Agent {
-  id               String        @id @default(uuid())
+  id               String            @id @default(uuid())
   agencyId         String
-  created          DateTime      @default(now())
-  updated          DateTime      @updatedAt
-  userName         String        @unique
-  agency           Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  created          DateTime          @default(now())
+  updated          DateTime          @updatedAt
+  userName         String            @unique
+  agency           Agency            @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   followers        Follow[]
   points           Point[]
   profile          ProfileAgent?
   prompts          Prompt[]
-  sources          Source[]
-  stories          Story[]
+  storiesAuthored  Story[]           @relation("AuthoredStories")
+  storyContributions StoryContribution[]
   tasks            Task[]
-  aiModels         AIModel[]     @relation("AgentToAIModel")
+  aiModels         AIModel[]         @relation("AgentToAIModel")
   defaultAiModelId String?
-  defaultAiModel   AIModel?      @relation("DefaultAIModelToAgent", fields: [defaultAiModelId], references: [id])
-  categories       Category[]    @relation("AgentToCategory")
+  defaultAiModel   AIModel?          @relation("DefaultAIModelToAgent", fields: [defaultAiModelId], references: [id])
+  categories       AgentCategory[]   @relation("AgentToCategory")
 }
+
 
 model ProfileAgent {
   id                  String  @id @default(uuid())
@@ -178,23 +179,37 @@ model ProfileAgent {
   agent               Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
 }
 
-model Source {
-  id            String     @id @default(uuid())
-  agentId       String
-  type          SourceType
-  ids           String[]
-  scrapperRunId String
-  agent         Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  runs          Run        @relation(fields: [scrapperRunId], references: [id], onDelete: Cascade)
-}
-
-model Category {
+model AgentCategory {
   id        String   @id @default(uuid())
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   agents    Agent[]  @relation("AgentToCategory")
 }
+
+// SOURCE AS TASK INPUT ///
+
+model Source {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  agentId     String
+  runId       String
+  run         Run          @relation(fields: [runId], references: [id], onDelete: Cascade)
+  casts       FarcasterPosts[]
+} 
+
+ 
+
+model FarcasterPosts {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  sourceId    String
+  inputType   FarcasterInputType
+  source      Source   @relation(fields: [sourceId], references: [id])
+  amount      Int?
+  withRecasts Boolean?
+}
+
 
 model Task {
   id           String     @id @default(uuid())
@@ -222,7 +237,8 @@ model Run {
   updatedAt    DateTime?   @updatedAt
   status       RunStatus   @default(CREATED)
   Task         Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  story        Story?
+  storyId      String
+  story        Story       @relation(fields: [storyId], references: [id] , onDelete: Cascade)
   sources      Source[]
   cost         Float?
   tokens       Float?
@@ -230,22 +246,26 @@ model Run {
 }
 
 model RunResult {
-  id         String       @id @default(uuid())
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  run        Run          @relation(fields: [runId], references: [id])
-  runId      String
-  sourcePost SourcePost[]
-  llmOutput  LlmOutput[]
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  run         Run           @relation(fields: [runId], references: [id])
+  runId       String
+  sourcePost  SourcePost[]
+  LLMResponse LLMResponse[]
 }
+
+////////////////  SCRAPPER OUTPUT START  ///////////////////////
 
 model SourcePost {
   id          String       @id @default(uuid())
   createdAt   DateTime     @default(now())
+  timestamp   DateTime
   content     String
   likes       Int?
   reCasts     Int?
-  output      Json
+  output      Json?
+  hash        String
   authorId    String
   author      SourceAuthor @relation(fields: [authorId], references: [id])
   runResultId String
@@ -253,38 +273,121 @@ model SourcePost {
 }
 
 model SourceAuthor {
-  id           String       @id @default(uuid())
-  fid          Int          @unique
-  createdAt    DateTime     @default(now())
-  userName     String
-  displayName  String
-  avatarUrl    String?      @db.VarChar(500)
-  followers    Int?
-  following    Int?
-  activeStatus String?
-  posts        SourcePost[]
+  id            String       @id @default(uuid())
+  fid           Int          @unique
+  createdAt     DateTime     @default(now())
+  userName      String
+  displayName   String
+  bioText       String?
+  verifications String[]
+  avatarUrl     String?      @db.VarChar(500)
+  followers     Int?
+  following     Int?
+  activeStatus  String?
+  posts         SourcePost[]
 }
 
-model LlmOutput {
-  id              String    @id @default(uuid())
-  createdAt       DateTime  @default(now())
-  model           String
-  promptToken     Int?
-  completionToken Int?
-  content         String
-  runId           String
-  runResultId     String
-  runResult       RunResult @relation(fields: [runResultId], references: [id])
-  output          Json
+////////////////  SCRAPPER OUTPUT END  ///////////////////////
+
+//////////////// LLM OUTPUT START ///////////////////////
+model LLMResponse {
+  id                String       @id @default(uuid())
+  createdAt         DateTime     @default(now())
+  model             String
+  promptToken       Int?
+  completionToken   Int?
+  systemFingerPrint String?
+  finishReason      String?
+  content           LLMContent[]
+  runId             String
+  runResultId       String
+  runResult         RunResult    @relation(fields: [runResultId], references: [id])
+  output            Json?
+  toolCalls         ToolCall[]
 }
 
+model LLMContent {
+  id            String                 @id @default(uuid())
+  title         String?
+  content       String?
+  summary       String?
+  categories    CategoryOnLLMContent[]
+  tags          TagOnLLMContent[]
+  manipulation  String?
+  annotations   Annotations[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  LLMResponseId String
+  llmResponse   LLMResponse            @relation(fields: [LLMResponseId], references: [id], onDelete: Cascade)
+}
+
+  // add embedding later
+
+model Category {
+  id          String                 @id @default(uuid())
+  name        String                 @unique
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  llmContents CategoryOnLLMContent[]
+}
+
+model CategoryOnLLMContent {
+  categoryId   String
+  llmContentId String
+  category     Category   @relation(fields: [categoryId], references: [id])
+  llmContent   LLMContent @relation(fields: [llmContentId], references: [id])
+
+  @@id([categoryId, llmContentId])
+}
+
+model Annotations {
+  id             String     @id @default(uuid())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  llmcontentId   String
+  userName       String?
+  annotationText String?
+  llmcontent     LLMContent @relation(fields: [llmcontentId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id          String            @id @default(uuid())
+  name        String            @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  llmContents TagOnLLMContent[]
+}
+
+model TagOnLLMContent {
+  tagId       String
+  llmContentId String
+  tag         Tag      @relation(fields: [tagId], references: [id])
+  llmContent  LLMContent @relation(fields: [llmContentId], references: [id])
+
+  @@id([tagId, llmContentId])
+}
+
+model ToolCall {
+  id            String      @id @default(uuid())
+  type          String
+  function      Json
+  LLMResponse   LLMResponse @relation(fields: [LLMResponseId], references: [id])
+  LLMResponseId String
+}
+
+//////////////// LLM OUTPUT END  ///////////////////////
+
+//////////////// LLM INPUT START  ///////////////////////
 model Prompt {
   id             String          @id @default(uuid())
-  responseFormat Json?
   outputStyle    String?
   temperature    Float?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  maxTokens      Int?
+  responseFormat Json?
+  seed           String?
+  tools          Tool[] // This field links to the Tool model
   agentId        String
   tasks          Task[]
   agent          Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
@@ -312,22 +415,48 @@ model SystemMessage {
   prompt    Prompt   @relation(fields: [promptId], references: [id])
 }
 
+model Tool {
+  id         String    @id @default(uuid())
+  type       String    @default("function")
+  functionId String?   @unique
+  function   Function? @relation(fields: [functionId], references: [id])
+  promptId   String
+  prompt     Prompt    @relation(fields: [promptId], references: [id])
+}
+
+model Function {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  parameters  Json
+  tool        Tool?
+}
+
+//////////////// LLM INPUT END  ///////////////////////
+
 model Story {
-  id        String     @id @default(uuid())
-  title     String
-  content   String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  agentId   String
-  tags      String[]
-  views     Int        @default(0)
-  bookmarks Bookmark[]
-  comments  Comment[]
-  points    Point[]
-  agent     Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  runId     String     @unique
-  run       Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
-  votes     Vote[]
+  id                String              @id @default(uuid())
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  views             Int                 @default(0)
+  status            String?             @default("INITIAL")
+  type              String?
+  bookmarks         Bookmark[]
+  comments          Comment[]
+  points            Point[]
+  votes             Vote[]
+  runs              Run[]
+  authorId          String
+  author            Agent               @relation("AuthoredStories", fields: [authorId], references: [id]  )
+  storyContributions StoryContribution[]
+}
+
+model StoryContribution {
+  storyId String
+  story   Story @relation(fields: [storyId], references: [id] ,  onDelete: Cascade)
+  agentId String
+  agent   Agent @relation(fields: [agentId], references: [id] , onDelete: Cascade) // arrange here later * delete cascade
+  @@id([storyId, agentId])
 }
 
 model Point {
@@ -347,7 +476,7 @@ enum VoteType {
   NONE
 }
 
-enum SourceType {
+enum FarcasterInputType {
   FARCASTER_USER
   FARCASTER_POST
   FARCASTER_CHANNEL
@@ -366,3 +495,6 @@ enum RunStatus {
   COMPLETED
   FAILED
 }
+
+
+ 

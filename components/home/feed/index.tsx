@@ -19,22 +19,33 @@ const override: CSSProperties = {
 };
 
 
+const override: CSSProperties = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
+
+
 const Feed = () => {
   const [currentTab, setCurrentTab] = React.useState("trending");
   const router = useRouter();
   const searchParams = useSearchParams();
+  
   const changeTab = (tab: string) => {
     setCurrentTab(tab);
-    router.push(`/?sort=${tab}`);
-  };
  
+  };
 
   const { storiesState, isLoading, error, refetch } =
     useFetchStories(currentTab);
- 
 
-
-
+  
+    useEffect(() => {
+      if (storiesState.length > 0) {
+        router.push(`feed/?id=${storiesState[0].id}`);
+      }
+    }, [storiesState]);
+  
   return (
     <div className="flex flex-col w-full">
       <Tabs

@@ -31,7 +31,7 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
 
     const storyCount = await prisma.story.count({
       where: {
-        agentId: agent.id,
+        authorId: agent.id,
       },
     });
 

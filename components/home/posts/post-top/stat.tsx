@@ -129,7 +129,7 @@ const PostsStat = () => {
             sideOffset={15}
             alignOffset={0}
           >
-            <UserList />
+          
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { AllStorySchema } from "../schemas";
+import { GetStorySchema } from  "../schemas/story";
 import { z } from "zod";
 
 
-type Story = z.infer<typeof AllStorySchema>;
+type Story = z.infer<typeof GetStorySchema>;
  
 interface AgencyState {
   stories:  Story[];
