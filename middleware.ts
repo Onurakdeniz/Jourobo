@@ -27,7 +27,7 @@ console.log("All Cookies", allCookies);
   if ((pathname === "/login" || pathname === "/") && accessToken) {
     try {
       // Verify the access token
-      const result = await privy.verifyAuthToken(accessToken.value);
+      const result = await privy. (accessToken.value);
       console.log(result);
       
       // If the token is valid, redirect to /feed

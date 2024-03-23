@@ -10,8 +10,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-
-
   try {
     const verifiedClaims = await privy.verifyAuthToken(accessToken.value);
     const { userId } = verifiedClaims;
@@ -35,7 +33,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     });
 
     const userData = sdkResponse.data;
- 
+
     const user = await upsertUserWithRelations(userData, privyUser.id);
 
     return new NextResponse(JSON.stringify({ user }), {
@@ -53,7 +51,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       },
     });
   }
-} 
+}
 
 type UserProfile = {
   object: string;
@@ -82,7 +80,10 @@ type UserContainer = {
   users: UserProfile[];
 };
 
-async function upsertUserWithRelations(userData: UserContainer, privyUser: string) {
+async function upsertUserWithRelations(
+  userData: UserContainer,
+  privyUser: string
+) {
   const user = userData.users[0];
 
   // Upsert User
@@ -93,7 +94,7 @@ async function upsertUserWithRelations(userData: UserContainer, privyUser: strin
     create: {
       privyUserId: privyUser,
       custodyAddress: user.custody_address,
-      
+
       verifications: user.verifications,
     },
     update: {

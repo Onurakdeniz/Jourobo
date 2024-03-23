@@ -5,6 +5,9 @@ import { cookies } from "next/headers";
 // Improved error handling and logging
 export async function authMiddleware(req: NextRequest) {
   try {
+    
+    const allCookies = cookies().getAll();
+console.log("All Cookies", allCookies);
     const privyUserId = cookies().get("x-user-id")?.value;
     console.log("User ID", privyUserId);
     if (!privyUserId) {
