@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 export async function authMiddleware(req: NextRequest) {
   try {
     const privyUserId = cookies().get("x-user-id")?.value;
+    console.log("User ID", privyUserId);
     if (!privyUserId) {
       console.error("Unauthorized: User ID not found");
       return new NextResponse(
