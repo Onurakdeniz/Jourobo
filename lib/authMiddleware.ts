@@ -1,21 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
-
+import { privy } from "@/lib/privy";
 // Improved error handling and logging
 export async function authMiddleware(req: NextRequest) {
   try {
-    
-    const allCookies = cookies().getAll();
-console.log("All Cookies", allCookies);
-    const privyUserId = cookies().get("x-user-id")?.value;
-    console.log("User ID", privyUserId);
+    const accessToken = cookies().get("privy-token");
+    console.log("Access Token", accessToken);
+
+    if (!accessToken) {
+      // Handle the case where accessToken is undefined
+      console.log("Access token is undefined");
+      return;
+    }
+
+    // Continue with your code using accessToken
+
+    const result = await privy.verifyAuthToken(accessToken.value);
+    const { userId: privyUserId } = result;
+
     if (!privyUserId) {
       console.error("Unauthorized: User ID not found");
-      return new NextResponse(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const currentUser = await prisma.user.findUnique({
@@ -25,10 +34,10 @@ console.log("All Cookies", allCookies);
 
     if (!currentUser) {
       console.error("User not found");
-      return new NextResponse(
-        JSON.stringify({ error: "User not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new NextResponse(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     return currentUser;
