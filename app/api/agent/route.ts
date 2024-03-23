@@ -96,7 +96,7 @@ async function isAgencyOwner(
   }
 }
 
-async function createAgentByAgencyUserName(
+  async function createAgentByAgencyUserName(
   data: CreateAgentData,
   agencyUserName: string
 ): Promise<any> {
@@ -151,4 +151,4 @@ async function createAgentByAgencyUserName(
   }
 }
 
-export { createAgentByAgencyUserName };
+ 

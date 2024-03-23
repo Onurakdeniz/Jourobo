@@ -1,8 +1,10 @@
+'use client'
+
 import Feed from '@/components/home/feed'
 import Posts from '@/components/home/posts'
 import React from 'react'
 
-const Page = () => {
+const page = () => {
   return (
     <div className="flex h-full   md:mt-4  w-full" >
     <div className="flex h-full w-full md:w-7/12 mx-auto md:pr-4">
@@ -15,4 +17,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default page

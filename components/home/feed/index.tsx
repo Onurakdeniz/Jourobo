@@ -11,6 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+const override: CSSProperties = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
+
+
 const Feed = () => {
   const [currentTab, setCurrentTab] = React.useState("trending");
   const router = useRouter();
@@ -25,11 +32,7 @@ const Feed = () => {
     useFetchStories(currentTab);
  
 
-  const override: CSSProperties = {
-    display: "block",
-    margin: "0 auto",
-    borderColor: "red",
-  };
+
 
   return (
     <div className="flex flex-col w-full">

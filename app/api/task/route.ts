@@ -100,7 +100,7 @@ if (task) {
   }
 }
 
-export async function createRunbyTaskId(taskId: string): Promise<any> {
+ async function createRunbyTaskId(taskId: string): Promise<any> {
   try {
     // Logic for creating a run related to a task
     const run = await prisma.run.create({
