@@ -1,5 +1,6 @@
 "use client";
-import React, { CSSProperties, useEffect } from "react";
+import React, { CSSProperties, useEffect ,Suspense } from "react";
+ 
 import FeedTop from "./top";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import FeedContent from "./feed-content";
