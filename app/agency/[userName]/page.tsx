@@ -23,7 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import BeatLoader from "react-spinners/BeatLoader";
 import { useFetchAgencies } from "@/hooks/useFetchAgencies";
 import { useAgencyStore } from "@/store/agency";
-import { useSearchParams } from "next/navigation";
+
 
 const override: CSSProperties = {
   display: "block",

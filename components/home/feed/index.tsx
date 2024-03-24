@@ -5,7 +5,6 @@ import FeedTop from "./top";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import FeedContent from "./feed-content";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { useFetchStories } from "@/hooks/useFetchStories";
 import BeatLoader from "react-spinners/BeatLoader";
 import { Input } from "@/components/ui/input";

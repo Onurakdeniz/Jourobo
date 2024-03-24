@@ -3,7 +3,6 @@ import PostCard from "../post-card";
 import { Scroll } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFetchPostsByStoryId } from "@/hooks/useFetchPosts";
-import { useSearchParams } from "next/navigation";
 import BeatLoader from "react-spinners/BeatLoader";
 
 const override: CSSProperties = {

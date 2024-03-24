@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { privy } from "@/lib/privy";
+
+export const dynamic = "force-dynamic"
 // Improved error handling and logging
 export async function authMiddleware(req: NextRequest) {
   try {
+
+
+    
     const accessToken = cookies().get("privy-token");
  
 

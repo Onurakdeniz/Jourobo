@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAgencyStore } from "@/store/agency";
 import AgencyStats from "@/app/agency/components/top-stats";
 import AgencyInfo from "@/app/agency/components/entity-info";
