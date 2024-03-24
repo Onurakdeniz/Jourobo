@@ -45,7 +45,7 @@ model Comment {
 
 model Vote {
   id        String   @id @default(uuid())
-  vote      VoteType @default(NONE)
+  vote      VoteType  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
@@ -204,10 +204,11 @@ model FarcasterPosts {
   id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
   sourceId    String
+  inputs      String
   inputType   FarcasterInputType
   source      Source   @relation(fields: [sourceId], references: [id])
-  amount      Int?
-  withRecasts Boolean?
+  limit      Int?
+  isWithRecast Boolean?
 }
 
 
@@ -215,10 +216,12 @@ model Task {
   id           String     @id @default(uuid())
   agentId      String
   createdAt    DateTime   @default(now())
-  isOneTimeRun Boolean    @default(true)
+  isStaticRun Boolean    @default(true)
   interval     Int?
   state        TaskState? @default(ACTIVE)
   description  String?
+  limit       Int?
+  isWithRecasts Boolean? @default(false)
   name         String
   Agent        Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
   runs         Run[]
@@ -231,6 +234,7 @@ model Task {
 model Run {
   id           String      @id @default(uuid())
   eventId      String?
+  eventName    String?
   triggerRunId String?
   taskId       String
   createdAt    DateTime    @default(now())
@@ -392,7 +396,7 @@ model Prompt {
   tasks          Task[]
   agent          Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
   promptMessage  PromptMessage[]
-  systemMessage  SystemMessage[]
+ systemMessage  SystemMessage[]
 }
 
 model PromptMessage {
@@ -439,11 +443,13 @@ model Story {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   views             Int                 @default(0)
-  status            String?             @default("INITIAL")
+  status            String?             @default("INITIALIZED")
   type              String?
   bookmarks         Bookmark[]
   comments          Comment[]
   points            Point[]
+  bookmarkAmount    Int                 @default(0)
+  voteAmount         Int                 @default(0)
   votes             Vote[]
   runs              Run[]
   authorId          String
@@ -473,7 +479,6 @@ model Point {
 enum VoteType {
   UP
   DOWN
-  NONE
 }
 
 enum FarcasterInputType {
@@ -494,6 +499,12 @@ enum RunStatus {
   RUNNING
   COMPLETED
   FAILED
+}
+
+enum Status {
+
+  INITIALIZED
+  CREATED
 }
 
 

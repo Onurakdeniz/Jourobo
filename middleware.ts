@@ -15,20 +15,17 @@ export async function middleware(request: NextRequest) {
 
   // Check if the current path is one of the noAuthRedirectPaths
   const shouldSkipAuthRedirect = noAuthRedirectPaths.some(path => pathname.startsWith(path));
-
-  const allCookies = request.cookies.getAll();
-console.log("All Cookies", allCookies);
-
+ 
   // Attempt to get the access token
   const accessToken = request.cookies.get("privy-token");
-  console.log("Access Token", accessToken);
+ 
 
   // If the user is on the login page or the home page and has a valid access token, redirect them to /feed
   if ((pathname === "/login" || pathname === "/") && accessToken) {
     try {
       // Verify the access token
       const result = await privy.verifyAuthToken(accessToken.value);
-      console.log(result,"verprivy");
+     
       
       // If the token is valid, redirect to /feed
       return NextResponse.redirect(new URL("/feed", request.url));

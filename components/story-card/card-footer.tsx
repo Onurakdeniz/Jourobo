@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useVoteMutation    } from "@/hooks/useVoteMutation";  
-import { useSaveMutation   } from "@/hooks/useSaveMutation";  
-import { useVoteStatus     } from "@/hooks/useVoteStatus";
-import { useSaveStatus     } from "@/hooks/useSaveStatus";
+import { useVoteMutation } from "@/hooks/useVoteMutation";
+import { useSaveMutation } from "@/hooks/useSaveMutation";
+import { useVoteStatus } from "@/hooks/useVoteStatus";
+import { useSaveStatus } from "@/hooks/useSaveStatus";
 import {
   Eye,
   CircleArrowDown,
@@ -13,16 +13,20 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 
-const CardFooter = ({ storyId, views }) => {
-  const { data: voteStatus, refetch: refetchVoteStatus } = useVoteStatus(storyId);
+const CardFooter = ({ storyId, views, vote, bookMarks }) => {
+  const { data: voteStatus, refetch: refetchVoteStatus } =
+    useVoteStatus(storyId);
   const { mutate: toggleVote, isPending: isVotePending } = useVoteMutation();
 
-  const { data: saveStatus, refetch: refetchSaveStatus } = useSaveStatus(storyId);
+  const { data: saveStatus, refetch: refetchSaveStatus } =
+    useSaveStatus(storyId);
   const { mutate: toggleSave, isPending: isSavePending } = useSaveMutation();
 
-  const [localBookmarks, setLocalBookmarks] = useState(0); // Example initial state
+  const [localBookmarks, setLocalBookmarks] = useState(bookMarks); // Example initial state
+  const [localViews, setLocalViews] = useState(views); // Example initial state
+  const [localVotes, setLocalVotes] = useState(vote); // Example initial state
 
-  const handleVote = (voteAction:any) => {
+  const handleVote = (voteAction: any) => {
     toggleVote(
       { storyId, voteAction },
       {
@@ -33,14 +37,17 @@ const CardFooter = ({ storyId, views }) => {
     );
   };
 
+  console.log("save", saveStatus);
   const handleBookmarkToggle = () => {
-    const action = saveStatus?.isSaved ? "unsave" : "save";
+    const action = saveStatus?.isBookmarked ? "save" : "unsave";
     toggleSave(
       { storyId, action },
       {
         onSuccess: () => {
           refetchSaveStatus();
-          setLocalBookmarks((prev) => (action === "save" ? prev + 1 : Math.max(0, prev - 1)));
+          setLocalBookmarks((prev) =>
+            action === "unsave" ? prev + 1 : Math.max(0, prev - 1)
+          );
         },
       }
     );
@@ -52,23 +59,28 @@ const CardFooter = ({ storyId, views }) => {
         <Button
           variant="ghost"
           size="sm"
-          className="h-6"
-          onClick={() => handleVote(voteStatus?.voteStatus === 'DOWN' ? 'NONE' : 'DOWN')}
+          className={`h-6 ${
+            voteStatus?.voteType === "DOWN" ? "text-orange-600" : ""
+          }`}
+          onClick={() =>
+            handleVote(voteStatus?.voteType === "DOWN" ? "NONE" : "DOWN")
+          }
           disabled={isVotePending}
         >
           <CircleArrowDown size={16} />
         </Button>
 
-        <div className="text-xs font-bold">
-          {/* Display the current vote status or count here */}
-          {voteStatus?.voteStatus}
-        </div>
+        <div className="text-xs font-bold">{localVotes}</div>
 
         <Button
           variant="ghost"
           size="sm"
-          className="h-6"
-          onClick={() => handleVote(voteStatus?.voteStatus === 'UP' ? 'NONE' : 'UP')}
+          className={`h-6 ${
+            voteStatus?.voteType === "UP" ? "text-orange-600" : ""
+          }`}
+          onClick={() =>
+            handleVote(voteStatus?.voteType === "UP" ? "NONE" : "UP")
+          }
           disabled={isVotePending}
         >
           <CircleArrowUp size={16} />
@@ -85,7 +97,7 @@ const CardFooter = ({ storyId, views }) => {
         >
           {isSavePending ? (
             <Loader2 className="animate-spin" size={16} />
-          ) : saveStatus?.isSaved ? (
+          ) : saveStatus?.isBookmarked ? (
             <BookmarkCheck size={16} />
           ) : (
             <Bookmark size={16} />

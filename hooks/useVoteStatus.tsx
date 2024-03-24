@@ -1,20 +1,20 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 interface VoteStatusResponse {
-  voteStatus: 'UP' | 'DOWN' | 'NONE';
+  voteType: 'UP' | 'DOWN' | null;
 }
 
 export const useVoteStatus = (storyId: string): UseQueryResult<VoteStatusResponse, Error> => {
   return useQuery<VoteStatusResponse, Error>({
     queryKey: ['voteStatus', storyId],
     queryFn: async () => {
-      const response = await fetch(`/api/vote/status/${storyId}`);
+      const response = await fetch(`/api/vote/${storyId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      console.log(response.json(),"myvote");
-      return response.json();
+      const data = await response.json();
+      console.log(data, "myvote");
+      return data;
     },
- 
   });
 };

@@ -39,11 +39,7 @@ client.defineJob({
           role: z.literal("user"),
           content: z.string(),
         }),
-        systemMessage: z.object({
-          role: z.literal("system"),
-          content: z.string(),
-        }),
-        toolChoice: z.string(),
+        toolChoice: z.string().optional(),
         tools: z.array(z.any()).optional(),
       }),
 
@@ -54,8 +50,8 @@ client.defineJob({
           SourceType.FARCASTER_CHANNEL,
         ]),
         ids: z.string(),
-        amount: z.number().optional(),
-        withRecasts: z.boolean().optional(),
+        limit: z.number().optional(),
+        isWithRecast: z.boolean().optional(),
       }),
     }),
   }),
@@ -69,94 +65,83 @@ client.defineJob({
     let runResult: any;
     const sourceOutput = await io.runTask("neynar-fetch", async () => {
       let sourcePosts = [];
-      let result; // Declare result here to use it outside of the try-catch blocks
+      let result;
+
       switch (payload.source.SourceType) {
         case SourceType.FARCASTER_USER:
-          // Call fetch function for FARCASTER_USER_POSTS
-
           console.log("doneuseefast");
           try {
             result = await sdk.feed({
               feed_type: FeedType.Filter,
               filter_type: FilterType.Fids,
-              fids: payload.source.ids, // Ensure this is correctly formatted for the SDK call
-              limit: 2,
-              api_key: "NEYNAR_API_DOCS",
+              fids: payload.source.ids,
+              limit: payload.source.limit || 10,
+              with_recasts: payload.source.isWithRecast || false,
+              cursor: "",
             });
-
             sourcePosts = result.data;
-            console.log(sourcePosts);
           } catch (err) {
             console.error(err);
           }
           break;
 
         case SourceType.FARCASTER_POST:
-          // Call fetch function for FARCASTER_POST_ID
           try {
-            const results = []; // Use a different variable name to avoid confusion
-            for (const id of payload.source.ids) {
+            const results = [];
+            const ids = payload.source.ids.split(",");
+            for (const id of ids) {
+              console.log(id, "idcsa");
               const feedResult = await sdk.cast({
                 identifier: id,
                 type: "url",
-                api_key: "NEYNAR_API_DOCS",
               });
-
-              results.push(feedResult.data);
+              console.log(feedResult); // Add this line
+              results.push(feedResult.data.cast);
             }
-
-            sourcePosts = results;
-            console.log(sourcePosts);
+            sourcePosts = { casts: results };
           } catch (err) {
             console.error(err);
           }
           break;
+
         case SourceType.FARCASTER_CHANNEL:
-          // Call fetch function for FARCASTER_CHANNEL_POSTS
           try {
             result = await sdk.feed({
               feed_type: "filter",
               filter_type: FilterType.ChannelId,
-              channel_id: payload.source.ids, // Ensure this matches the SDK's expected parameter
-              with_recasts: true, // Changed from "true" to boolean true
-              limit:  payload.source.amount || 10, // Use the provided amount or default to 10
-              api_key: "NEYNAR_API_DOCS",
+              channel_id: payload.source.ids,
+              with_recasts: payload.source.isWithRecast || false,
+              limit: payload.source.limit || 10,
               cursor: "",
             });
-
             sourcePosts = result.data;
-            console.log(sourcePosts);
           } catch (err) {
             console.error(err);
           }
           break;
+
         default:
-          // Handle unknown SourceType
           console.log("Unknown SourceType");
           break;
       }
 
-      if (result) {
-        const jsonResult = JSON.parse(JSON.stringify(result.data)); // Directly use result.data
-        return jsonResult;
+      console.log("result", result);
+      console.log("orgnsource", sourcePosts.casts);
+      console.log("leng", sourcePosts.casts.length);
+      if (sourcePosts.casts.length > 0) {
+        return sourcePosts.casts;
       } else {
         return { error: "No data fetched or SourceType not supported." };
       }
     });
+
     // Task 2 - Save the source data to the database ///
 
-    const postes = sourceOutput.casts;
-
     const sourceDB = await io.runTask("save-source-output", async () => {
-      if (!Array.isArray(postes) || postes.length === 0) {
-        console.log("No source output to save.");
-        return [];
-      }
-
-      console.log("Source output to save:", postes);
+      console.log("Source output to save:", sourceOutput);
 
       try {
-        runResult = await prisma.runResult.create({
+        const runResult = await prisma.runResult.create({
           data: {
             runId: ctx.event.context.runId,
           },
@@ -165,48 +150,38 @@ client.defineJob({
         console.log(runResult, "runResult");
 
         const sourcePostDbs = await Promise.all(
-          postes.map(async (sourcePost) => {
+          sourceOutput.map(async (post) => {
             try {
-              if (sourcePost.text && sourcePost.author.fid) {
-                let author = await prisma.sourceAuthor.findUnique({
-                  where: { fid: sourcePost.author.fid },
+              if (post.text && post.author.fid) {
+                const author = await prisma.sourceAuthor.upsert({
+                  where: { fid: post.author.fid },
+                  update: {},
+                  create: {
+                    fid: post.author.fid,
+                    userName: post.author.username,
+                    displayName: post.author.display_name,
+                    avatarUrl: post.author.pfp_url,
+                    followers: post.author.follower_count,
+                    following: post.author.following_count,
+                    activeStatus: post.author.active_status,
+                    verifications: post.author.verifications,
+                    bioText: post.author.profile?.bio?.text || "",
+                  },
                 });
-
-                if (!author) {
-                  // Create the author if not found
-                  author = await prisma.sourceAuthor.upsert({
-                    where: { fid: sourcePost.author.fid },
-                    update: {},
-                    create: {
-                      fid: sourcePost.author.fid,
-                      userName: sourcePost.author.username,
-                      displayName: sourcePost.author.display_name,
-                      avatarUrl: sourcePost.author.pfp_url,
-                      followers: sourcePost.author.follower_count,
-                      following: sourcePost.author.following_count,
-                      activeStatus: sourcePost.author.active_status,
-                      verifications: sourcePost.author.verifications,
-                      bioText: sourcePost.author.profile.bio.text,
-                    },
-                  });
-                }
 
                 return await prisma.sourcePost.create({
                   data: {
-                    content: sourcePost.text,
-                    hash: sourcePost.hash,
-                    timestamp: new Date(sourcePost.timestamp),
-                    likes: sourcePost.reactions.likes.length,
-                    reCasts: sourcePost.reactions.recasts.length,
+                    content: post.text,
+                    hash: post.hash,
+                    timestamp: new Date(post.timestamp),
+                    likes: post.reactions?.likes?.length || 0,
+                    reCasts: post.reactions?.recasts?.length || 0,
                     authorId: author.id,
                     runResultId: runResult.id,
                   },
                 });
               } else {
-                console.error(
-                  "Missing required fields in sourcePost:",
-                  sourcePost
-                );
+                console.error("Missing required fields in post:", post);
                 return null;
               }
             } catch (error) {
@@ -236,7 +211,7 @@ client.defineJob({
       }));
     }
 
-    const llmInputSources = extractData(sourceOutput.casts);
+    const llmInputSources = extractData(sourceOutput);
 
     function formatContentForAPI(inputSources: any) {
       // Concatenate the desired fields from each object into a single string
@@ -260,7 +235,7 @@ client.defineJob({
     const result = await io.openai.chat.completions.backgroundCreate(
       "background-chat-completion",
       {
-        model: "gpt-4-turbo-preview",
+        model: payload.openAIRequest.model,
         response_format: { type: "json_object" },
         max_tokens: payload.openAIRequest.maxTokens,
         messages: [
@@ -293,6 +268,7 @@ client.defineJob({
     }
 
     console.log(parsedContent, "parsedContent");
+
     const toolCalls = result.choices[0]?.message?.tool_calls;
     const promptToken = result.usage?.prompt_tokens;
     const completionToken = result.usage?.completion_tokens;
@@ -310,15 +286,16 @@ client.defineJob({
 
     const runId = ctx.event.context.runId;
     const taskId = ctx.event.context.taskId;
+    const storyId = ctx.event.context.storyId;
 
     const storeLLMOutput = await io.runTask("save-llm-response", async () => {
-      const runResult = await prisma.runResult.findFirst({
+      const runResultCheck = await prisma.runResult.findFirst({
         where: {
           runId: runId,
         },
       });
 
-      if (!runResult) {
+      if (!runResultCheck) {
         throw new Error(`RunResult with runId ${runId} not found`);
       }
       try {
@@ -332,11 +309,13 @@ client.defineJob({
             runId,
             runResult: {
               connect: {
-                id: runResult.id,
+                id: runResultCheck.id,
               },
             },
           },
         });
+
+        console.log(newLLMResponse, "newLLMResponse");
 
         const newLLMContent = await prisma.lLMContent.create({
           data: {
@@ -387,6 +366,8 @@ client.defineJob({
           },
         });
 
+        console.log(newLLMContent, "newLLMContent");
+
         const llmResponseWithRelations = await prisma.lLMResponse.findUnique({
           where: { id: newLLMResponse.id },
           include: {
@@ -399,6 +380,18 @@ client.defineJob({
             },
           },
         });
+
+        try {
+          const updatedStory = await prisma.story.update({
+            where: { id: storyId }, // replace `storyId` with the ID of the story you want to update
+            data: { status: "CREATED" },
+          });
+
+          console.log("Story status updated successfully:", updatedStory);
+        } catch (error) {
+          console.error("Error updating story status:", error);
+          throw error;
+        }
 
         console.log(
           "LLMResponse and related entities created successfully:",

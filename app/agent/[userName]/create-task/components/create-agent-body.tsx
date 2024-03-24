@@ -19,6 +19,7 @@ import { CircleCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -46,8 +47,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useMutation } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-
-export const oneTimeRun = ["One Time Run", "Dynamic Run"];
+import { CreateTaskSchema } from "@/schemas"; // Importing the schema
+export const taskTypes = [
+  { label: "Static Task", value: "true" }, // Representing static as true
+  { label: "Dynamic Task", value: "false" }, // Representing dynamic as false
+];
 
 const companies = ["Openai", "Anthropic", "Gemini"];
 
@@ -71,35 +75,14 @@ enum SourceType {
   FARCASTER_CHANNEL = "FARCASTER_CHANNEL",
 }
 
-const CreateTaskSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1),
-  isStaticRun: z.boolean(),
-  interval: z.string().optional(),
-  prompt: z.object({
-    promptMessage: z.object({
-      content: z.string().min(1),
-    }),
-    systemMessage: z.object({
-      content: z.string().optional(),
-    }),
-  }),
-  aiModel: z.object({
-    llm: z.string().optional().nullable(),
-    model: z.string().optional().nullable(),
-    apiKey: z.string().optional().nullable(),
-  }),
-  source: z.object({
-    type: z.nativeEnum(SourceType),
-    ids: z.array(z.string().min(1)),
-  }),
-});
-
 type CreateTaskType = z.infer<typeof CreateTaskSchema>;
 
 const CreateAgentBody = () => {
   const form = useForm<z.infer<typeof CreateTaskSchema>>({
     resolver: zodResolver(CreateTaskSchema),
+    defaultValues: {
+      isStaticRun: true,
+    },
   });
 
   const {
@@ -113,7 +96,7 @@ const CreateAgentBody = () => {
   const [showApiKey, setShowApiKey] = useState(false);
 
   const router = useRouter();
-  const agentId = useParams().userName;
+  const agentUsername = useParams().userName;
 
   const postTaskData = async (taskData: CreateTaskType) => {
     const response = await fetch("/api/task", {
@@ -123,7 +106,7 @@ const CreateAgentBody = () => {
       },
       body: JSON.stringify({
         ...taskData,
-        agentId,
+        agentUsername,
       }),
     });
 
@@ -147,10 +130,14 @@ const CreateAgentBody = () => {
   const onSubmit: SubmitHandler<z.infer<typeof CreateTaskSchema>> = async (
     data
   ) => {
+    console.log(data, "motadata");
     const response = await mutation.mutateAsync(data);
- 
-    router.push(`/agent/${agentId}`);
+
+    router.push(`/agent/${agentUsername}`);
   };
+
+  const isStaticRun = form.watch("isStaticRun");
+  const selectedOption = form.watch("source.type");
 
   return (
     <ScrollArea className="flex w-full">
@@ -188,10 +175,10 @@ const CreateAgentBody = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Task Description*</FormLabel>
+                    <FormLabel>Task Description</FormLabel>
 
                     <FormControl>
-                      <Textarea {...field} className="w-full h-24 border p-2" />
+                      <Textarea {...field} className="w-full h-16 border p-2" />
                     </FormControl>
                     {errors.description && (
                       <FormMessage className="text-red-500">
@@ -210,25 +197,24 @@ const CreateAgentBody = () => {
                     <FormControl>
                       <ToggleGroup
                         type="single"
-                        id="compannies"
-                        value={field.value ? "true" : "false"} // Convert boolean to string
-                        size="lg"
-                        className="flex justify-start h-fit items-center gap-4 w-full"
-                        onValueChange={(value) =>
-                          field.onChange(value === "true")
-                        } // Convert back to boolean
+                        value={field.value ? "true" : "false"}
+                        onValueChange={(value) => {
+                          field.onChange(value === "true");
+                        }}
+                        className="flex justify-start items-center gap-4 w-full"
                       >
-                        {oneTimeRun.map((option, index) => (
-                          <FormControl key={index}>
-                            <ToggleGroupItem
-                              key={index}
-                              value={option}
-                              aria-label={`Select ${option}`}
-                              className="inline-flex w-1/2 m-0 py-6 border border-rounded border-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-lg data-[state=on]:bg-teal-50 data-[state=on]:text-black"
-                            >
-                              <div className="text-sm capitalize">{option}</div>
-                            </ToggleGroupItem>
-                          </FormControl>
+                        {taskTypes.map((type, index) => (
+                          <ToggleGroupItem
+                            key={index}
+                            value={type.value}
+                            aria-label={`Select ${type.label}`}
+                            className="inline-flex w-1/2 m-0 py-6 border border-rounded border-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-lg data-[state=on]:bg-teal-50 data-[state=on]:text-black"
+                            disabled={type.label === "Dynamic Task"}
+                          >
+                            <div className="text-sm capitalize">
+                              {type.label}
+                            </div>
+                          </ToggleGroupItem>
                         ))}
                       </ToggleGroup>
                     </FormControl>
@@ -237,26 +223,27 @@ const CreateAgentBody = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="interval"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Agent Avatar URL</FormLabel>
-
-                    <FormControl>
-                      <Input
-                        type="text"
-                        {...field}
-                        className="w-full border p-2"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500">
-                      {errors.interval?.message?.toString()}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
+              {isStaticRun === false && (
+                <FormField
+                  control={form.control}
+                  name="interval"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Interval Value</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          {...field}
+                          className="w-full border p-2"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500">
+                        {errors.interval?.message?.toString()}
+                      </FormMessage>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="flex gap-2 text-2xl w-full text-orange-600 font-bold pb-2 border-b py-4 my-4">
                 Prompt
@@ -278,29 +265,6 @@ const CreateAgentBody = () => {
                     {errors.prompt?.promptMessage?.content && (
                       <FormMessage className="text-red-500">
                         {errors.prompt?.promptMessage?.message}
-                      </FormMessage>
-                    )}
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="prompt.systemMessage.content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>System Message(Instructions)</FormLabel>
-                    <FormDescription>
-                      Provide custom instructions as a system message to the AI
-                      model.
-                    </FormDescription>
-
-                    <FormControl>
-                      <Textarea {...field} className="w-full h-24 border p-2" />
-                    </FormControl>
-                    {errors.prompt?.systemMessage?.content && (
-                      <FormMessage className="text-red-500">
-                        {errors.prompt?.systemMessage?.message}
                       </FormMessage>
                     )}
                   </FormItem>
@@ -356,14 +320,29 @@ const CreateAgentBody = () => {
                 name="source.ids"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Add Post Urls or User & Channel Ids</FormLabel>
+                    <FormLabel>
+                      {selectedOption === "FARCASTER_POST"
+                        ? "Add Post Urls*"
+                        : selectedOption === "FARCASTER_CHANNEL"
+                        ? "Add Channel Ids*"
+                        : selectedOption === "FARCASTER_USER"
+                        ? "Add User Ids*"
+                        : "Add Post Urls or User & Channel Ids*"}
+                    </FormLabel>
+
+                    <FormDescription>
+                      {selectedOption === "FARCASTER_POST"
+                        ? "Add the post urls separated by commas."
+                        : selectedOption === "FARCASTER_CHANNEL"
+                        ? "Add the channel names separated by commas."
+                        : selectedOption === "FARCASTER_USER"
+                        ? "Add the user farcaster ids separated by commas."
+                        : "Add the post urls or user & channel ids separated by commas."}
+                    </FormDescription>
                     <FormControl>
                       <Input
                         type="text"
-                        value={field.value ? field.value.join(", ") : ""}
-                        onChange={(e) =>
-                          field.onChange(e.target.value.split(", "))
-                        }
+                        {...field}
                         className="w-full border p-2"
                       />
                     </FormControl>
@@ -373,6 +352,62 @@ const CreateAgentBody = () => {
                   </FormItem>
                 )}
               />
+
+              {["FARCASTER_CHANNEL", "FARCASTER_USER"].includes(
+                selectedOption
+              ) && (
+                <FormField
+                  control={form.control}
+                  name="limit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Limit Value</FormLabel>
+                      <FormDescription>
+                        Number of posts to fetch maximum 100 , consider the
+                        content size for llm.
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value))
+                          }
+                          className="w-full border p-2"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500">
+                        {errors.interval?.message?.toString()}
+                      </FormMessage>
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {["FARCASTER_CHANNEL", "FARCASTER_USER"].includes(
+                selectedOption
+              ) && (
+                <FormField
+                  control={form.control}
+                  name="isWithRecasts"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Recasts Included</FormLabel>
+                        <FormDescription>
+                          Include recasts in the task.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="flex gap-2 text-2xl w-full items-center pt-4 text-muted-foreground mt-4  font-bold pb-2 border-b">
                 Add Your AI Model{" "}

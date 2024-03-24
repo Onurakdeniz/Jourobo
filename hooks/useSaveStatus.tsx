@@ -1,7 +1,7 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 interface SaveStatusResponse {
-  isSaved: boolean;
+  isBookmarked: boolean;
 }
 
 export const useSaveStatus = (storyId: string): UseQueryResult<SaveStatusResponse, Error> => {

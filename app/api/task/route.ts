@@ -19,7 +19,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       throw new Error("Authentication failed");
     }
 
-    const agentUserName = data.agentId;
+    const agentUserName = data.agentUsername;
     const userOwnsAgent = await isUserOwnerOfAgent(
       currentUser.id,
       agentUserName
@@ -33,36 +33,102 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
       );
     }
-
+    console.log("parsedData", parsedData);
     // Proceed to create task since user owns the agent
     const task = await createTaskByAgentUserName(parsedData, agentUserName);
     if (task) {
       // Assuming agentId and starterAgentId are available or retrieved from somewhere
-      const story = await createStory(task.agentId, task.starterAgentId);
+      const createStoryByAgentUsername = async (agentUserName: string) => {
+        // Find the agent by username
+        const agent = await prisma.agent.findUnique({
+          where: {
+            userName: agentUserName,
+          },
+        });
+
+        // If no agent is found, throw an error
+        if (!agent) {
+          throw new Error(`No agent found with username: ${agentUserName}`);
+        }
+
+        // Create a story with the found agent as the author
+        const storyFetch = await prisma.story.create({
+          data: {
+            status: "INITIAL",
+            authorId: agent.id,
+          },
+        });
+
+        return storyFetch;
+      };
+
+      // Usage
+      const story = await createStoryByAgentUsername(agentUserName);
+
+      if (!story) {
+        throw new Error("Failed to create story");
+      }
+
       const run = await createRunbyTaskIdAndStoryId(task.id, story.id);
+
+      if (!run) {
+        throw new Error("Failed to create run");
+      }
 
       const payload = {
         openAIRequest: {
-          model: " ",
+          model: "gpt-4-turbo-preview",
           promptMessage: {
             role: "user",
-            content: "ssds",
+            content: parsedData.prompt.promptMessage.content,
           },
-          systemMessage: {
-            role: "system",
-            content: "content",
-          },
-          toolChoice: "", // Specify the tool choice here
-          tools: [], // Specify any tools here if needed
+
+          toolChoice: "",
+          tools: [],
+          isStaticRun: parsedData.isStaticRun,
         },
         source: {
-          SourceType: "FARCASTER_CHANNEL",
-          ids: "base",
-          amount: 15,
-          withRecasts: true,
+          SourceType: parsedData.source.type,
+          ids: parsedData.source.ids,
+          limit: parsedData.limit || 10,
+          isWithRecast: parsedData.isWithRecasts,
         },
       };
 
+      const agent = await prisma.agent.findUnique({
+        where: {
+          userName: agentUserName,
+        },
+      });
+
+      if (!agent) {
+        throw new Error("No agent found");
+      }
+
+      const newSource = await prisma.source.create({
+        data: {
+          agentId: agent.id,
+          run: {
+            connect: {
+              id: run.id,
+            },
+          },
+          casts: {
+            create: [
+              {
+                inputType: parsedData.source.type,
+                inputs: parsedData.source.ids,
+                limit: parsedData.limit,
+                isWithRecast: parsedData.isWithRecasts,
+              },
+            ],
+          },
+        },
+      });
+
+      if (!newSource) {
+        throw new Error("Failed to create source");
+      }
       const send = await client.sendEvent({
         name: "static-task",
         timestamp: new Date(),
@@ -72,6 +138,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           storyId: story.id,
         },
         payload: payload,
+      });
+
+      const updateRun = await prisma.run.update({
+        where: {
+          id: run.id,
+        },
+        data: {
+          status: "RUNNING",
+          eventId: send.id,
+          eventName: send.name,
+        },
       });
 
       // Return a successful response
@@ -105,7 +182,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 }
 
- async function createRunbyTaskId(taskId: string): Promise<any> {
+async function createRunbyTaskIdAndStoryId(
+  taskId: string,
+  storyId: string
+): Promise<any> {
   try {
     // Logic for creating a run related to a task
     const run = await prisma.run.create({

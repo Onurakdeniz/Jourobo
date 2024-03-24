@@ -55,7 +55,7 @@ const AgentButtons = () => {
           </DialogContent>
         </Dialog>
       </TooltipProvider>
-
+{/* 
       <TooltipProvider>
         <Dialog open={openAgency} onOpenChange={setOpenAgency}>
           <Tooltip>
@@ -89,7 +89,7 @@ const AgentButtons = () => {
           </DialogContent>
         </Dialog>
       </TooltipProvider>
-
+ */}
       <TooltipProvider>
       <Tooltip>
             <TooltipTrigger asChild>

@@ -24,11 +24,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import  {UserList} from "./user-list";
+import { UserList } from "./user-list";
 import AgentName from "./agent-name";
 import { StoryWithAll } from "@/schemas";
 import { z } from "zod";
- 
 
 type Story = z.infer<typeof StoryWithAll>;
 type Agent = Story["agent"];
@@ -38,27 +37,27 @@ const CardHeader = ({
   createdAt,
   postNumbers,
   postAuthors,
- 
 }: {
   agent: Agent;
   createdAt: Date;
   postNumbers: number;
   postAuthors: any;
- 
 }) => {
   console.log(postAuthors, "postAuthors");
   const sortedAuthors = postAuthors.sort((a, b) => b.followers - a.followers);
 
   const topAuthors = sortedAuthors.slice(0, 4);
   return (
-    <div className={`flex flex-1 items-center justify-between w-full   border-b py-2  `}>
+    <div
+      className={`flex flex-1 items-center justify-between w-full   border-b py-2  `}
+    >
       <div className="flex-col w-8/12  flex">
         <div className="flex gap-2 items-center">
           <div className="flex-col flex ">
             <AgentName agentValue={agent} createdAt={createdAt} />
           </div>
         </div>
-      </div>
+      </div>      
 
       <div className="flex w-4/12 justify-end gap-3 items-center">
         <div className="flex gap-2 items-center">

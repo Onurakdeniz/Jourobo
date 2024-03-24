@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 const SearchBar = () => {
   return (
  
-<Input type="text" placeholder="Search" className='hidden md:flex w-5/12 mr-12' />
+<Input type="text" disabled placeholder="Search" className='hidden md:flex w-5/12 mr-12' />
   
   )
 }
