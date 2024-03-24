@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
 
   // Paths that should not redirect authenticated users to /feed
   const noAuthRedirectPaths = [
+    '/login',
     '/api/register',
     '/api/trigger',
     '/_next/static',
@@ -15,22 +16,37 @@ export async function middleware(request: NextRequest) {
 
   // Check if the current path is one of the noAuthRedirectPaths
   const shouldSkipAuthRedirect = noAuthRedirectPaths.some(path => pathname.startsWith(path));
- 
+
   // Attempt to get the access token
   const accessToken = request.cookies.get("privy-token");
- 
 
-  // If the user is on the login page or the home page and has a valid access token, redirect them to /feed
-  if ((pathname === "/login" || pathname === "/") && accessToken) {
+  // If the user is authenticated and on the root path, redirect to /feed
+  if (accessToken && pathname === "/") {
     try {
       // Verify the access token
       const result = await privy.verifyAuthToken(accessToken.value);
-     
-      
       // If the token is valid, redirect to /feed
       return NextResponse.redirect(new URL("/feed", request.url));
     } catch (error) {
-      // If the token is invalid, do nothing and allow access to the login or home page
+      // If the token is invalid, redirect to the login page
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
+  // If the user is not authenticated and not on a noAuthRedirectPath, redirect to the login page
+  if (!accessToken && !shouldSkipAuthRedirect) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // If the user is authenticated and on the login page, redirect to /feed
+  if (accessToken && pathname === "/login") {
+    try {
+      // Verify the access token
+      const result = await privy.verifyAuthToken(accessToken.value);
+      // If the token is valid, redirect to /feed
+      return NextResponse.redirect(new URL("/feed", request.url));
+    } catch (error) {
+      // If the token is invalid, do nothing and allow access to the login page
       console.error(error);
     }
   }
