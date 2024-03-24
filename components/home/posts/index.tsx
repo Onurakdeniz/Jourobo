@@ -45,19 +45,26 @@ export default Posts;
 const PostSkeleton = () => {
   return (
     <div className="flex-col flex w-full gap-3">
-      <Skeleton className="h-12 w-full" />
-      <div className="flex h-12 gap-3 w-full">
-        <Skeleton className="h-6 w-full" />
-      </div>
-      <div className="flex h-16 gap-6 w-full">
-        <Skeleton className="h-6 w-24" />
-        <Skeleton className="h-6 w-24" />
-        <Skeleton className="h-6 w-24" />
-      </div>
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
+    <Skeleton className="h-12 w-full" />
+    <div className="flex  gap-1 w-full">
+      <Skeleton className="h-6 w-full" />
     </div>
+    <div className="flex   gap-1 w-full">
+      <Skeleton className="h-6 w-24" />
+      <Skeleton className="h-6 w-24" />
+      <Skeleton className="h-6 w-24" />
+    </div>
+    <Skeleton className="h-32 w-full" />
+    <Skeleton className="h-32 w-full" />
+    <Skeleton className="h-32 w-full" />
+    <Skeleton className="h-32 w-full" />
+  </div>
+
+
+
+
+
+
+
   );
 };

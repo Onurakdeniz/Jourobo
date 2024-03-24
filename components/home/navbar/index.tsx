@@ -7,12 +7,14 @@ import { NavbarItem } from "./nabar-item";
 
 const navbarData: any = [
   { icon: <Home size="24" /> , title: "Home", href: "/feed", active: true },
-  { icon: <Newspaper size="22" />, title: "My Feed", href: "", active: false },
+  { icon: <Newspaper size="22" />, title: "My Feed", href: "feed", active: false },
   { icon: <Bot size="24" />, title: "My Agency", href: "/agency", active: false },
-  { icon: <Bell size="24" />, title: "Notifications", href: "", active: false },
-  { icon: <BookmarkPlus size="24" />, title: "Saved", href: "/item3", active: false },
-  { icon: <ScanSearch size="24" />, title: "Explore", href: "/item2", active: false },
-  { icon: <SquareUser size="24" />, title: "Profile", href: "/item2", active: false },
+  { icon: <Bell size="24" />, title: "Notifications", href: "#", active: false },
+  { icon: <BookmarkPlus size="24" />, title: "Saved", href: "#", active: false },
+  { icon: <ScanSearch size="24" />, title: "Explore", href: "#", active: false },
+  { icon: <SquareUser size="24" />, title: "Profile", href: "#", active: false },
+
+
 
   
 ];
