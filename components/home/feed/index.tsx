@@ -35,7 +35,7 @@ const Feed = () => {
     }
   }, [storiesState])
 
-  console.log("stories", storiesState)
+ 
 
   return (
     <div className="flex flex-col w-full">
@@ -46,12 +46,13 @@ const Feed = () => {
       >
         <FeedTop />
         {currentTab === "myfeed" && (
-          <div className="mt-4 flex w-full h-fit   items-center space-x-6">
+          <div className="mt-4 flex w-full h-16   items-center space-x-6">
             <Textarea
+    
               placeholder="
         Text your feed algorithm"
             />
-            <Button>sdsd</Button>
+            <Button variant={"outline"} disabled>Filter </Button>
           </div>
         )}
         {isLoading ? (

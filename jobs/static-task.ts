@@ -69,7 +69,7 @@ client.defineJob({
 
       switch (payload.source.SourceType) {
         case SourceType.FARCASTER_USER:
-          console.log("doneuseefast");
+          
           try {
             result = await sdk.feed({
               feed_type: FeedType.Filter,
@@ -90,7 +90,7 @@ client.defineJob({
             const results = [];
             const ids = payload.source.ids.split(",");
             for (const id of ids) {
-              console.log(id, "idcsa");
+       
               const feedResult = await sdk.cast({
                 identifier: id,
                 type: "url",
@@ -153,22 +153,26 @@ client.defineJob({
           sourceOutput.map(async (post) => {
             try {
               if (post.text && post.author.fid) {
-                const author = await prisma.sourceAuthor.upsert({
+                let author = await prisma.sourceAuthor.findUnique({
                   where: { fid: post.author.fid },
-                  update: {},
-                  create: {
-                    fid: post.author.fid,
-                    userName: post.author.username,
-                    displayName: post.author.display_name,
-                    avatarUrl: post.author.pfp_url,
-                    followers: post.author.follower_count,
-                    following: post.author.following_count,
-                    activeStatus: post.author.active_status,
-                    verifications: post.author.verifications,
-                    bioText: post.author.profile?.bio?.text || "",
-                  },
                 });
-
+        
+                if (!author) {
+                  author = await prisma.sourceAuthor.create({
+                    data: {
+                      fid: post.author.fid,
+                      userName: post.author.username,
+                      displayName: post.author.display_name,
+                      avatarUrl: post.author.pfp_url,
+                      followers: post.author.follower_count,
+                      following: post.author.following_count,
+                      activeStatus: post.author.active_status,
+                      verifications: post.author.verifications,
+                      bioText: post.author.profile?.bio?.text || "",
+                    },
+                  });
+                }
+        
                 return await prisma.sourcePost.create({
                   data: {
                     content: post.text,

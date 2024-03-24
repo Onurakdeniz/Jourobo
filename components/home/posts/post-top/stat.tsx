@@ -34,8 +34,7 @@ const PostsStat = () => {
     storyDate = calculateTimeDifference(storyInformation.createdAt);
   }
 
-  console.log (storyInformation , "storyInformation");
-  console.log (sourceState , "sourceState");
+ 
   
 
   return (
@@ -46,8 +45,8 @@ const PostsStat = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge
-                  variant="outline"
-                  className="rounded-sm border-none font-bold bg-orange-600 text-white mr-2"
+                  variant="default"
+                  className="rounded-sm border-none font-bold   mr-2"
                 >
                   {storyDate}
                 </Badge>
@@ -96,9 +95,17 @@ const PostsStat = () => {
         
       </div>
       <div className="flex gap-2 items-center pt-2">
-        <Badge variant="category"  className="text-orange-600 font-bold border-orange-600">
-      {sourceState?.sourceId}
-        </Badge>
+      <div className=" text-sm items-center">
+  {sourceState?.inputType === 'FARCASTER_CHANNEL'
+    ? <div className="items-center flex gap-1"><span className="  font-normal"> Channel Name</span> <Badge  variant="outline" className="ml-2 px-3 py-1 text-orange-600  capitalize"> {sourceState.sourceId} </Badge></div>
+    : sourceState?.inputType === 'FARCASTER_USER'
+    ? <div className="items-center flex gap-1"><span className="  font-normal"> Farcaster User Ids : </span> <Badge  variant="outline" className="ml-2 px-3 py-1 text-orange-600  capitalize"> {sourceState.sourceId} </Badge></div>  
+    : <div className="items-center flex gap-1"><span className="  font-normal"> Farcaster Url : </span> 
+    <a href={sourceState.sourceId } target="_blank" >  
+    <Badge  variant="outline" className="ml-2 px-3 py-1 text-orange-600 "> {sourceState.sourceId} </Badge> </a>
+    
+    </div>   }
+</div>
       </div>
     </div>
   );

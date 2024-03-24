@@ -13,7 +13,7 @@ import { useFetchPostsByStoryId } from "@/hooks/useFetchPosts";
 
 const Posts = () => {
   const { postsState, isLoading, error, refetch } = useFetchPostsByStoryId();
-  console.log(postsState, "postsState");
+ 
 
   if (error) {
     return <div>Error: {error.message}</div>;

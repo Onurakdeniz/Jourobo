@@ -19,7 +19,7 @@ import {
 
 const AgentListItem = ({ agent }: { agent: any }) => {
   const [isFollowing, setIsFollowing] = useState(false);
-  console.log(agent, "agentlist");
+ 
   const handleClick = () => {
     setIsFollowing(!isFollowing);
   };

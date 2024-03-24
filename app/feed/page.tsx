@@ -6,7 +6,7 @@ import React, { Suspense } from 'react'
 
 const page = () => {
   return (
-    <div className="flex h-full   md:mt-4  w-full" >
+    <div className="flex h-full   md:mt-2  w-full" >
     <div className="flex h-full w-full md:w-7/12 mx-auto md:pr-4">
     <Suspense>
       <Feed />

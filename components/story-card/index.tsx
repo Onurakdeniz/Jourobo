@@ -20,6 +20,8 @@ const FeedCard = ({ story }: { story: Story }) => {
     followers: post.author.followers,
   }));
 
+  console.log ("story", story)
+
   const aiModel =
     story.runs?.[0]?.results?.[0]?.LLMResponse?.[0]?.model ?? undefined;
   let aiModelName = aiModel;

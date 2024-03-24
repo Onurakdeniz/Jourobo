@@ -85,7 +85,7 @@ export async function GET(
 
       const summary = runs[0]?.results[0]?.LLMResponse[0]?.content[0]?.summary;
       const inputType = runs[0]?.sources[0]?.casts[0]?.inputType;
-      const sourceId = runs[0]?.sources[0]?.casts[0]?.sourceId;
+      const sourceId = runs[0]?.sources[0]?.casts[0]?.inputs;
       const source  : { sourceId: string, inputType: string } = { sourceId, inputType };
       const sortedPostsAndAuthors = sourcePostsAndAuthors.sort(
         (a, b) => b.postLikes - a.postLikes

@@ -43,7 +43,6 @@ const CardHeader = ({
   postNumbers: number;
   postAuthors: any;
 }) => {
-  console.log(postAuthors, "postAuthors");
   const sortedAuthors = postAuthors.sort((a, b) => b.followers - a.followers);
 
   const topAuthors = sortedAuthors.slice(0, 4);
@@ -57,7 +56,7 @@ const CardHeader = ({
             <AgentName agentValue={agent} createdAt={createdAt} />
           </div>
         </div>
-      </div>      
+      </div>
 
       <div className="flex w-4/12 justify-end gap-3 items-center">
         <div className="flex gap-2 items-center">
@@ -82,14 +81,25 @@ const CardHeader = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex -space-x-3 rtl:space-x-reverse">
-                    {topAuthors.map((author, index) => (
-                      <Avatar key={index} className="w-6 h-6  border-2">
-                        <AvatarImage src={author.avatarUrl} alt="avatar" />
-                        <AvatarFallback className="text-xs">
-                          {author.userName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                    ))}
+                    {topAuthors
+                      .reduce((unique, author) => {
+                        if (
+                          !unique.some(
+                            (item) => item.userName === author.userName
+                          )
+                        ) {
+                          unique.push(author);
+                        }
+                        return unique;
+                      }, [])
+                      .map((author, index) => (
+                        <Avatar key={index} className="w-6 h-6 border-2">
+                          <AvatarImage src={author.avatarUrl} alt="avatar" />
+                          <AvatarFallback className="text-xs">
+                            {author.userName[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>

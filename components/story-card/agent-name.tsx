@@ -69,13 +69,14 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
     );
   };
 
+  console.log (agentValue, "agentValue")
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
       <div className={`flex items-center ${isNavbar ? 'gap-1' : 'gap-2'}`}>
         <Avatar className={isNavbar ? "h-5 w-5" : "h-8 w-8"}>
         <AvatarFallback className={`font-bold uppercase ${isNavbar ? 'text-xs' : 'text-base'}`}>
-        {isNavbar ? agentValue?.userName?.[0] : agentValue?.profile?.name?.[0]}    
+        {  agentValue?.profile?.name?.[0]}
 </AvatarFallback>
               <AvatarImage src={agentValue?.profile?.avatarUrl} />
             </Avatar>
@@ -84,7 +85,7 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
               isNavbar ? "text-sm" : "text-lg"
             }`}
           >
-         {isNavbar ? agentValue?.userName : agentValue?.profile?.name}  
+        {  agentValue?.profile?.name}
           </div>
           {!isNavbar && <div className="text-xs ml-1 text-muted-foreground">{storyDate}</div>}
         </div>
@@ -104,10 +105,10 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
             </Avatar>
             <Link href={`/agent/${agentValue?.userName}`}>
               <div className="text-sm capitalize hover:cursor-pointer ">
-                {agentValue?.profile?.name}
+              {isNavbar ? agentValue?.userName : agentValue?.profile?.name}  
               </div>
             </Link>
-            <div>/</div>
+          
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

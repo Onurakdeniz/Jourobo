@@ -47,7 +47,7 @@ const CardBody = ({
                 <Badge
                   key={index}
                   variant="outline"
-                  className="flex gap-2 items-center px-2 font-light rounded-sm text-xs dark:bg-orange-600 bg-orange-100 text-orange-600  border-none dark:text-white"
+                  className="flex gap-2 items-center   font-light rounded-sm text-xs    dark:bg-orange-950  bg-orange-100 border-none border-orange-700 text-orange-600  px-3 dark:text-orange-600"
                 >
                   {tag.tag.name}
                 </Badge>
@@ -62,9 +62,13 @@ const CardBody = ({
             </Badge>
           </div>
         </div>
-        <div className="flex-col flex gap-3 text-sm   font-light py-2">
-          <div className="flex w-full items-start text-base dark:text-neutral-400 text-neutral-600 font-sans leading-relax text-balance overflow-hidden text-overflow-ellipsis whitespace-nowrap">
-            {content?.content}
+        <div className="flex-col flex gap-3 text-sm   font-light py-2 pr-2">
+          <div className="flex-col flex w-full  text-base dark:text-neutral-400 text-neutral-600   text-balance overflow-hidden ">
+            {content?.content.split("\n\n").map((paragraph, index) => (
+              <div key={index} className="mb-4 flex-wrap w-full flex leading-relax text-wrap text-justify overflow-hidden text-overflow-ellipsis whitespace-nowrap">
+                {paragraph}
+              </div>
+            ))}
           </div>
         </div>
       </div>

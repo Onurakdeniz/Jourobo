@@ -12,8 +12,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         },
       },
     });
-
-    console.log("Agent exists:", !!agent); // Log boolean value for existence check
+ 
 
     if (agent) {
       return new NextResponse(JSON.stringify({ available: false }), {
