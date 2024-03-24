@@ -5,7 +5,6 @@ import FeedTop from "./top";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import FeedContent from "./feed-content";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { useFetchStories } from "@/hooks/useFetchStories";
 import BeatLoader from "react-spinners/BeatLoader";
 import { Input } from "@/components/ui/input";
@@ -34,7 +33,9 @@ const Feed = () => {
     if (storiesState.length > 0) {
       router.push(`feed/?id=${storiesState[0].id}`);
     }
-  }, [storiesState]);
+  }, [storiesState])
+
+  console.log("stories", storiesState)
 
   return (
     <div className="flex flex-col w-full">
@@ -59,7 +60,7 @@ const Feed = () => {
               color="orange"
               loading={isLoading}
               cssOverride={override}
-              size={32}
+              size={24}
               aria-label="Loading Spinner"
               data-testid="loader"
             />

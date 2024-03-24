@@ -11,26 +11,36 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return currentUser;
     }
 
-    // Pagination setup
     const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
-    const pageSize = 30; // Items per page
+    const pageSize = 10;
     const skip = (page - 1) * pageSize;
     const sort = req.nextUrl.searchParams.get("sort");
 
     let orderBy: Prisma.StoryOrderByWithRelationInput[];
     if (sort === "trending") {
-      orderBy = [{ votes: { _count: { _asc: Prisma.SortOrder.DESC } } }];
+      orderBy = [{ votes: { _count: 'desc' } }];
     } else {
-      orderBy = [{ createdAt: Prisma.SortOrder.DESC }];
+      orderBy = [{ createdAt: 'desc' }];
     }
+    
     
     const stories = await prisma.story.findMany({
       skip,
       take: pageSize,
+      where: {
+        status: 'CREATED',
+      },
       include: {
         author: {
           include: {
             profile: true,
+            // Include the _count property to count followers and storiesAuthored
+            _count: {
+              select: {
+                followers: true, // Count the number of followers
+                storiesAuthored: true, // Count the number of stories authored
+              }
+            }
           },
         },
         runs: {
@@ -65,26 +75,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             },
           },
         },
-        votes: true,
-        _count: {
-          select: {
-            bookmarks: true,
-            votes: true,
-          },
-        },
       },
+      orderBy,
     });
-    
-    // Sort stories based on the vote count
-    let sortedStories;
-    if (sort === "trending") {
-      sortedStories = stories.sort((a, b) => b._count.votes - a._count.votes);
-    } else {
-      sortedStories = stories.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
-    
-    // Return the sorted stories
-    return new NextResponse(JSON.stringify(sortedStories), {
+ 
+    console.log(stories[0]?.bookmarkAmount); // Safely access the first story
+    console.log(stories[0]?.voteAmount);
+
+    return new NextResponse(JSON.stringify(stories), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +91,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   } catch (error) {
     console.error(error);
     return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
+      JSON.stringify({ error: "Internal Server Error", details: error.message }),
       {
         status: 500,
         headers: {

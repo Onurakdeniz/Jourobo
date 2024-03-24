@@ -1,5 +1,5 @@
 "use client";
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   HoverCard,
   HoverCardContent,
@@ -29,7 +29,7 @@ const calculateTimeDifference = (dateString: any) => {
   return timeDifference.replace("about ", "");
 };
 
-const AgentName = ({ agentValue, createdAt, isNavbar }) => {
+const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
   let agentDate, storyDate;
   if (agentValue) {
     agentDate = calculateTimeDifference(agentValue.created);
@@ -48,19 +48,12 @@ const AgentName = ({ agentValue, createdAt, isNavbar }) => {
     if (followStatus) {
       setIsFollowed(followStatus.isFollowing);
     }
-  }
-  , [followStatus]);
+  }, [followStatus]);
 
-
-  // Destructuring mutate function from the custom hook
   const { mutate, isPending, isError, error } = useFollowUnfollowMutation();
 
-  // Handler for the follow/unfollow action
   const handleFollowClick = () => {
-    // Determine the action based on current state
     const action = isFollowed ? "unfollow" : "follow";
-
-    // Call the mutate function with the agentId and action
     mutate(
       { agentId: agentValue.id, action },
       {
@@ -68,7 +61,7 @@ const AgentName = ({ agentValue, createdAt, isNavbar }) => {
         onSuccess: () => {
           setIsFollowed(!isFollowed);
         },
-        // Optionally, you can handle errors or perform actions on error
+
         onError: (error: Error) => {
           console.error("Mutation error:", error.message);
         },
@@ -79,17 +72,21 @@ const AgentName = ({ agentValue, createdAt, isNavbar }) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <div className="flex gap-2 items-center">
-          <Avatar className="h-8 w-8 items-center">
-            <AvatarFallback className="font-bold uppercase ">
-              {agentValue?.profile?.name?.[0]}
-            </AvatarFallback>
-            <AvatarImage src={agentValue?.profile?.avatarUrl} />
-          </Avatar>
-          <div className="capitalize cursor-pointer hover:text-primary/70">
-            {agentValue?.profile?.name}
+      <div className={`flex items-center ${isNavbar ? 'gap-1' : 'gap-2'}`}>
+        <Avatar className={isNavbar ? "h-5 w-5" : "h-8 w-8"}>
+        <AvatarFallback className={`font-bold uppercase ${isNavbar ? 'text-xs' : 'text-base'}`}>
+        {isNavbar ? agentValue?.userName?.[0] : agentValue?.profile?.name?.[0]}    
+</AvatarFallback>
+              <AvatarImage src={agentValue?.profile?.avatarUrl} />
+            </Avatar>
+          <div
+            className={`capitalize cursor-pointer hover:text-primary/70 ${
+              isNavbar ? "text-sm" : "text-lg"
+            }`}
+          >
+         {isNavbar ? agentValue?.userName : agentValue?.profile?.name}  
           </div>
-          <div className="text-xs ml-1 text-muted-foreground">{storyDate}</div>
+          {!isNavbar && <div className="text-xs ml-1 text-muted-foreground">{storyDate}</div>}
         </div>
       </HoverCardTrigger>
       <HoverCardContent
@@ -99,9 +96,11 @@ const AgentName = ({ agentValue, createdAt, isNavbar }) => {
       >
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
-            <Avatar className="h-5 w-5">
-              <AvatarFallback></AvatarFallback>
-              <AvatarImage src="/soty.png" />
+            <Avatar className={isNavbar ? "h-5 w-5" : "h-5 w-5"}>
+              <AvatarFallback className="font-bold uppercase ">
+                {agentValue?.profile?.name?.[0]}
+              </AvatarFallback>
+              <AvatarImage src={agentValue?.profile?.avatarUrl} />
             </Avatar>
             <Link href={`/agent/${agentValue?.userName}`}>
               <div className="text-sm capitalize hover:cursor-pointer ">
@@ -152,33 +151,20 @@ const AgentName = ({ agentValue, createdAt, isNavbar }) => {
         </div>
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge
-                    variant="outline"
-                    className="rounded-none border-none font-bold bg-orange-600 text-white"
-                  >
-                    {" "}
-                    8
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Agent Rank</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <Badge variant="outline" className="rounded-none font-normal">
-              {" "}
-              - Followers
+         
+            <Badge
+              variant="outline"
+              className="rounded-none flex gap-1 font-normal"
+            >
+              <span>  {isNavbar ? agentValue?.followersCount : agentValue?._count?.followers}   </span>
+              Followers
             </Badge>
-            <Badge variant="outline" className="rounded-none font-normal">
-              {" "}
-              - Stories
-            </Badge>
-            <Badge variant="outline" className="rounded-none font-normal">
-              {" "}
-              - Views
+            <Badge
+              variant="outline"
+              className="rounded-none flex gap-1 font-normal"
+            >
+              <span>      {isNavbar ? agentValue?.followersCount : agentValue?._count?.storiesAuthored}     {} </span>
+              Stories
             </Badge>
           </div>
         </div>

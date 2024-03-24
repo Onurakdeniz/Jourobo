@@ -18,6 +18,9 @@ const AuthorSchema = z.object({
   userName: z.string(),
   defaultAiModelId: z.null(),
   profile: AuthorProfileSchema,
+  numberOfFollowers: z.number(),
+  numberofStories: z.number(),
+  numberOfViews: z.number().optional(),
 });
 
 const AnnotationSchema = z.object({
@@ -140,11 +143,11 @@ const GetStorySchema = z.object({
   authorId: z.string(),
   author: AuthorSchema,
   runs: z.array(RunSchema),
-  votes: z.array(z.any()), // Adjust based on actual vote structure
-  _count: z.object({
-    bookmarks: z.number(),
-    votes: z.number(),
-  }),
+  voteAmount  : z.number(),
+  bookmarkAmount: z.number(),
+  
+ 
+   
 });
 
 export { GetStorySchema , LLMContentSchema};

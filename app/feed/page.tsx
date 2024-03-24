@@ -13,7 +13,9 @@ const page = () => {
     </Suspense>
     </div>
     <div className="hidden md:flex-col md:flex gap-2 border-l pl-4 h-full w-5/12">
+    <Suspense>
       <Posts />
+      </Suspense>
     </div>
   </div>
   )

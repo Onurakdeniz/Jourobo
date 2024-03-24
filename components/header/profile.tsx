@@ -23,7 +23,9 @@ const Profile = () => {
     usePrivy();
 
   const displayName = user?.farcaster?.displayName || "User";
-
+ console.log(user , 1);
+ console.log(authenticated , 2);
+ console.log(ready , 3);
   // to get updated user data
   const { login } = useLogin({
     onComplete: async (user, isNewUser) => {

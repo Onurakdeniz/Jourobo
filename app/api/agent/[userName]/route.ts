@@ -23,6 +23,8 @@ export async function GET(
     const { userName } = params;
  
     const agent = await getAgentByAgentUserName(userName);
+
+    
     return NextResponse.json({ agent }, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {

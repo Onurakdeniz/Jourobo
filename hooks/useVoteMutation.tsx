@@ -3,13 +3,14 @@ import { useMutation } from "@tanstack/react-query";
 // TypeScript interfaces for the request and response
 type VoteRequest = {
   storyId: string;
-  voteAction: "UP" | "DOWN" | "NONE"; // Actions based on your voting logic
+  voteAction: "UP" | "DOWN"; // Updated actions based on the new voting logic
 };
 
 interface VoteResponse {
-  message: string; // Assuming the response contains a message
-  vote: {
-    voteStatus: "UP" | "DOWN" | "NONE";
+  message: string;
+  vote?: {
+    id: string;
+    vote: "UP" | "DOWN";
     // Additional fields can be included based on your actual response structure
   };
 }
@@ -30,6 +31,14 @@ export const useVoteMutation = () => {
       }
 
       return response.json();
+    },
+    onSuccess: (data) => {
+      console.log("Vote mutation successful:", data);
+      // Perform any additional actions or update the cache if needed
+    },
+    onError: (error) => {
+      console.error("Vote mutation error:", error);
+      // Handle the error or display an error message
     },
   });
 };

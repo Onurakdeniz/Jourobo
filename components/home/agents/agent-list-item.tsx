@@ -10,24 +10,36 @@ import {
 } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AgentName from "@/components/story-card/agent-name";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-const AgentListItem = () => {
+const AgentListItem = ({ agent }: { agent: any }) => {
   const [isFollowing, setIsFollowing] = useState(false);
-
+  console.log(agent, "agentlist");
   const handleClick = () => {
     setIsFollowing(!isFollowing);
   };
-
+  const createdAt = agent.created;
   return (
     <div className="flex justify-between items-center h-8">
-       <AgentName isNavbar={true} />
+      <AgentName agentValue={agent} createdAt={createdAt} isNavbar={true} />
       <div className="flex gap-2 items-center">
-      
-        
-       
-        <Badge variant="default" className="text-xs px-1 py-0 justify-end">
-          <span>232</span>
-        </Badge>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant="outline" className="rounded-xl  font-bold    ">
+                {agent.followersCount}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Number of Followers</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );

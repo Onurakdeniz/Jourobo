@@ -5,17 +5,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import React from "react";
+import { usePostStore } from "@/store/posts";
 
 const PostTitle = () => {
+
+  const summary = usePostStore((state) => state.summary);
   return (
     <div className="flex ">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className=" line-clamp-5 text-lg font-thin">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500sLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
+            <span className=" line-clamp-5 text-xl font-thin">
+              {summary}
             </span>
           </TooltipTrigger>
           <TooltipContent
@@ -25,10 +26,7 @@ const PostTitle = () => {
             sideOffset={2}
           >
             <p>
-              {" "}
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s{" "}
+            {summary}
             </p>
           </TooltipContent>
         </Tooltip>

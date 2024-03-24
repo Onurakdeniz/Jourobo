@@ -23,7 +23,7 @@ export async function createTaskByAgentUserName(data: CreateTaskData, agentUserN
       data: {
         name: data.name,
         description: data.description,
-        isOneTimeRun: !data.isStaticRun,
+        isStaticRun: !data.isStaticRun,
         interval: data.interval ? parseInt(data.interval, 10) : undefined,
         Agent: {
           connect: { userName: agentUserName },

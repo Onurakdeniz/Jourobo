@@ -76,7 +76,7 @@ const TaskInfo = ({
                   : "N/A"}
               </Badge>
               <Badge variant="default" className=" px-2  flex text-xs font-light">
-                {isOneTimeRun ? "Static Run" : "Dynamic Run"}
+                {isOneTimeRun ? "Dynamic Run" : "Static Run"}
               </Badge>
             </div>
           </div>

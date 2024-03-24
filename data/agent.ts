@@ -35,6 +35,13 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
       },
     });
 
+    const followersCount = await prisma.follow.count({
+      where: {
+        agentId: agent.id,
+      },
+    });
+
+
     // Create a new array of tasks with the runsCount and totalViews properties
     const tasksWithRunsCountAndViews = agent.tasks.map(task => ({
       ...task,
@@ -43,9 +50,9 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
     }));
 
     // Create a new agent object with the tasksWithRunsCountAndViews and storyCount properties
-    const agentWithStoryCountAndViews = { ...agent, tasks: tasksWithRunsCountAndViews, storyCount };
+    const agentWithCountsAndViews = { ...agent, tasks: tasksWithRunsCountAndViews, storyCount, followersCount };
 
-    return agentWithStoryCountAndViews;
+    return agentWithCountsAndViews;
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Agent retrieval failed with error: ${error.message}`);

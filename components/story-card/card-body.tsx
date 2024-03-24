@@ -9,52 +9,63 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card"
- 
+} from "@/components/ui/hover-card";
 
 type content = z.infer<typeof LLMContentSchema>;
 
-const CardBody = ({ content , aiModel, storyId}: { content: content , aiModel : string  , storyId: string;}) => {
-  
-
+const CardBody = ({
+  content,
+  aiModel,
+  storyId,
+}: {
+  content: content;
+  aiModel: string;
+  storyId: string;
+}) => {
   return (
     <div className="flex w-full flex-wrap">
       <div className="flex-col flex gap-4 w-full  flex-1">
         <div className="flex w-full justify-between mt-2 text-pretty   capitalize  text-lg  ">
-        <Link href={`/feed?id=${storyId}`}>
-        <div className="font-semibold overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-  {content?.title}
-</div>
+          <Link href={`/feed?id=${storyId}`}>
+            <div
+              className="font-semibold overflow-hidden"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {content?.title}
+            </div>
           </Link>
-       
         </div>
         <div className="flex justify-between w-full items-center ">
-        <div className="flex gap-2 w-full items-center ">
-  {content && content.tags &&
-    content.tags.map((tag, index) => (
-      <Badge
-        key={index}
-        variant="outline"
-        className="flex gap-2 items-center px-2 rounded-sm text-xs border-orange-600 text-orange-600"
-      >
-        {tag.tag.name}
-      </Badge>
-    ))}
-    </div>
-       <div className="flex items-center gap-2 w-3/12 justify-end ">
-            
+          <div className="flex gap-2 w-full items-center ">
+            {content &&
+              content.tags &&
+              content.tags.map((tag, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="flex gap-2 items-center px-2 font-light rounded-sm text-xs dark:bg-orange-600 bg-orange-100 text-orange-600  border-none dark:text-white"
+                >
+                  {tag.tag.name}
+                </Badge>
+              ))}
+          </div>
+          <div className="flex items-center gap-2 w-3/12 justify-end ">
             <Badge className="px-2  text-[10px]}" variant="outline">
-            {aiModel}
+              {aiModel}
             </Badge>
             <Badge className="px-2  text-[10px]}" variant="outline">
-            OpenAI
+              OpenAI
             </Badge>
           </div>
-</div>
+        </div>
         <div className="flex-col flex gap-3 text-sm   font-light py-2">
-        <div className="flex w-full items-start text-base dark:text-neutral-400 text-neutral-600 font-sans leading-relax text-balance overflow-hidden text-overflow-ellipsis whitespace-nowrap">
-  {content?.content}
-</div>
+          <div className="flex w-full items-start text-base dark:text-neutral-400 text-neutral-600 font-sans leading-relax text-balance overflow-hidden text-overflow-ellipsis whitespace-nowrap">
+            {content?.content}
+          </div>
         </div>
       </div>
     </div>
@@ -63,10 +74,7 @@ const CardBody = ({ content , aiModel, storyId}: { content: content , aiModel : 
 
 export default CardBody;
 
-
-
-const UserHoverCard = ({ annotations }: { annotations : any }) => {
-
+const UserHoverCard = ({ annotations }: { annotations: any }) => {
   return (
     <HoverCard>
       <HoverCardTrigger>
@@ -84,12 +92,11 @@ const UserHoverCard = ({ annotations }: { annotations : any }) => {
       <HoverCardContent>
         <div className="flex-col gap-2">
           <div className="text-sm font-semibold">{user.profile.name}</div>
-          <div className="text-xs text-neutral-500">{user.profile.description}</div>
+          <div className="text-xs text-neutral-500">
+            {user.profile.description}
+          </div>
         </div>
       </HoverCardContent>
     </HoverCard>
   );
-}
-
-
-
+};

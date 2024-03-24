@@ -587,26 +587,27 @@ enum SourceType {
   FARCASTER_CHANNEL = "FARCASTER_CHANNEL",
 }
 
+ 
+
 export const CreateTaskSchema = z.object({
   name: z.string().min(1),
-  description: z.string().min(1),
+  description: z.string().optional(),
   isStaticRun: z.boolean(),
   interval: z.string().optional(),
+  isWithRecasts: z.boolean().optional(),
+  limit: z.number().optional(),
   prompt: z.object({
     promptMessage: z.object({
       content: z.string().min(1),
     }),
-    systemMessage: z.object({
-      content: z.string().optional(),
-    }),
   }),
   aiModel: z.object({
-    llm: z.string().optional(),
-    model: z.string().optional(),
-    apiKey: z.string().optional(),
+    llm: z.string().optional().nullable(),
+    model: z.string().optional().nullable(),
+    apiKey: z.string().optional().nullable(),
   }),
   source: z.object({
     type: z.nativeEnum(SourceType),
-    ids: z.array(z.string().min(1)),
+    ids: z.string().min(1),
   }),
 });
