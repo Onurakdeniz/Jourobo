@@ -13,13 +13,11 @@ import { useFetchPostsByStoryId } from "@/hooks/useFetchPosts";
 
 const Posts = () => {
   const { postsState, isLoading, error, refetch } = useFetchPostsByStoryId();
- 
 
   if (error) {
     return <div>Error: {error.message}</div>;
   }
 
-const PostSkeleton = () => {
   return (
     <>
       {isLoading ? (
@@ -46,26 +44,19 @@ export default Posts;
 const PostSkeleton = () => {
   return (
     <div className="flex-col flex w-full gap-3">
-    <Skeleton className="h-12 w-full" />
-    <div className="flex  gap-1 w-full">
-      <Skeleton className="h-6 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <div className="flex  gap-1 w-full">
+        <Skeleton className="h-6 w-full" />
+      </div>
+      <div className="flex   gap-1 w-full">
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-6 w-24" />
+      </div>
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
     </div>
-    <div className="flex   gap-1 w-full">
-      <Skeleton className="h-6 w-24" />
-      <Skeleton className="h-6 w-24" />
-      <Skeleton className="h-6 w-24" />
-    </div>
-    <Skeleton className="h-32 w-full" />
-    <Skeleton className="h-32 w-full" />
-    <Skeleton className="h-32 w-full" />
-    <Skeleton className="h-32 w-full" />
-  </div>
-
-
-
-
-
-
-
   );
 };
