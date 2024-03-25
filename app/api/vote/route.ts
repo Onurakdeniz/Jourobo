@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import { authMiddleware } from "@/lib/authMiddleware";
 
 export async function POST(req: NextRequest) {
@@ -16,12 +16,10 @@ export async function POST(req: NextRequest) {
     const requestBody = await req.json();
     const { storyId, voteAction } = requestBody;
     if (!storyId || !voteAction) {
-      return NextResponse.json({ error: "Missing storyId or voteAction" }, { status: 400 });
-    }
-
-    // Validate voteAction
-    if (!['UP', 'DOWN', 'NONE'].includes(voteAction.toUpperCase())) {
-      return NextResponse.json({ error: "Invalid voteAction. Must be 'UP', 'DOWN', or 'NONE'" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing storyId or voteAction" },
+        { status: 400 }
+      );
     }
 
     // Check if a vote already exists for this story by the current user
@@ -31,20 +29,57 @@ export async function POST(req: NextRequest) {
         storyId: storyId,
       },
     });
+    if (!existingVote) {
+      // If there is no existing vote, create a new vote
+      const newVote = await prisma.vote.create({
+        data: {
+          vote: voteAction.toUpperCase(),
+          storyId: storyId,
+          userId: userId,
+        },
+      });
 
-    if (existingVote) {
-      // If a vote exists, check the current vote status
+      // Update the voteAmount in the Story model
+      await prisma.story.update({
+        where: {
+          id: storyId,
+        },
+        data: {
+          voteAmount: {
+            increment: voteAction.toUpperCase() === "UP" ? 1 : -1,
+          },
+        },
+      });
+
+      return NextResponse.json(
+        { message: `Vote created successfully` },
+        { status: 200 }
+      );
+    } else {
       if (existingVote.vote === voteAction.toUpperCase()) {
         // If the current vote matches the action, delete the vote
         await prisma.vote.delete({
           where: {
             id: existingVote.id,
           },
+        });
+
+        // Update the voteAmount in the Story model
+        await prisma.story.update({
+          where: {
+            id: storyId,
+          },
           data: {
-            vote: 'NONE',
+            voteAmount: {
+              increment: voteAction.toUpperCase() === "UP" ? -1 : 1,
+            },
           },
         });
-        return NextResponse.json({ message: `Vote reset successfully`, vote: updatedVote }, { status: 200 });
+
+        return NextResponse.json(
+          { message: `Vote deleted successfully` },
+          { status: 200 }
+        );
       } else {
         // If the current vote does not match the action, update the vote
         const updatedVote = await prisma.vote.update({
@@ -55,26 +90,27 @@ export async function POST(req: NextRequest) {
             vote: voteAction.toUpperCase(),
           },
         });
-        return NextResponse.json({ message: `Vote updated successfully`, vote: updatedVote }, { status: 200 });
-      }
-    } else {
-      // If no vote exists, create a new one unless the action is NONE
-      if (voteAction.toUpperCase() === 'NONE') {
-        return NextResponse.json({ error: "Cannot set vote to NONE without an existing vote" }, { status: 400 });
-      } else {
-        const newVote = await prisma.vote.create({
+
+        // Update the voteAmount in the Story model based on the vote change
+        await prisma.story.update({
+          where: {
+            id: storyId,
+          },
           data: {
-            userId: currentUser.id,
-            storyId: storyId,
-            vote: voteAction.toUpperCase(),
+            voteAmount: {
+              increment: voteAction.toUpperCase() === "UP" ? 2 : -2,
+            },
           },
         });
-        return NextResponse.json({ message: "Vote added successfully", vote: newVote }, { status: 200 });
+
+        return NextResponse.json(
+          { message: `Vote updated successfully` },
+          { status: 200 }
+        );
       }
     }
-     
   } catch (error) {
-    console.error('Failed to process vote:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Failed to process vote:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
