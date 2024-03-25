@@ -14,7 +14,7 @@ const FeedTop = () => {
   {tabs.map((tab) => (
     <TabsTrigger
       key={tab.value}
-      className="justify-center items-center rounded-full text-lg p-0 w-32 py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
+      className="justify-center items-center border text-lg p-0 w-32 py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
       value={tab.value}
     >
       {tab.text}

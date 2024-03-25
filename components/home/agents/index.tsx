@@ -20,24 +20,26 @@ const Agents = () => {
     showTrendingAgents ? "trending" : "latest"
   );
 
+  const tabs = [
+    { value: 'trending', text: 'Trending Agents' },
+    { value: 'latest', text: 'New Agents' },
+  ];
+
   return (
     <>
       {showTrendingAgents && (
         <>
           <Tabs defaultValue="trending" className="border-t mt-2 h-full">
             <TabsList className="flex gap-2 px-0 justify-start w-full bg-background mt-4">
-              <TabsTrigger
-                  className="justify-center items-center rounded-full text-xs px-4   py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
-                value="trending"
-              >
-                Trending Agents
-              </TabsTrigger>
-              <TabsTrigger
-                className="justify-center items-center rounded-full text-xs px-4   py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
-                value="latest"
-              >
-                New Agents
-              </TabsTrigger>
+            {tabs.map((tab) => (
+  <TabsTrigger
+    key={tab.value}
+    className="justify-center items-center rounded-full text-xs px-4 py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none"
+    value={tab.value}
+  >
+    {tab.text}
+  </TabsTrigger>
+))}
             </TabsList>
 
             <TabsContent value="trending" className="mt-4">

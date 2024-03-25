@@ -292,6 +292,8 @@ client.defineJob({
     const taskId = ctx.event.context.taskId;
     const storyId = ctx.event.context.storyId;
 
+    console.log(references, "references");
+
     const storeLLMOutput = await io.runTask("save-llm-response", async () => {
       const runResultCheck = await prisma.runResult.findFirst({
         where: {
@@ -321,6 +323,8 @@ client.defineJob({
 
         console.log(newLLMResponse, "newLLMResponse");
 
+        
+
         const newLLMContent = await prisma.lLMContent.create({
           data: {
             title,
@@ -349,9 +353,9 @@ client.defineJob({
               })),
             },
             annotations: {
-              create: references?.map((annotation) => ({
-                userName: annotation.userName,
-                annotationText: annotation.annotationText,
+              create: references?.map((ref) => ({
+                userName: ref.Source,
+                annotationText: ref.Annotation,
               })),
             },
           },

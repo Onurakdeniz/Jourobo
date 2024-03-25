@@ -17,7 +17,9 @@ const override: CSSProperties = {
   borderColor: "red",
 };
 
-const Feed = () => {
+const Feed = ({
+  pathName,
+}) => {
   const [currentTab, setCurrentTab] = React.useState("trending");
   const router = useRouter();
  
@@ -61,6 +63,7 @@ const Feed = () => {
               color="orange"
               loading={isLoading}
               cssOverride={override}
+              size={24}
               size={24}
               aria-label="Loading Spinner"
               data-testid="loader"

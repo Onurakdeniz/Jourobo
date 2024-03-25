@@ -56,7 +56,7 @@ const CardHeader = ({
             <AgentName agentValue={agent} createdAt={createdAt} />
           </div>
         </div>
-      </div>
+      </div>      
 
       <div className="flex w-4/12 justify-end gap-3 items-center">
         <div className="flex gap-2 items-center">

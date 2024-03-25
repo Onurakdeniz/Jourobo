@@ -16,9 +16,11 @@ import { usePrivy, useLogin } from "@privy-io/react-auth";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const Profile = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { ready, authenticated, user, getAccessToken, isModalOpen, logout } =
     usePrivy();
 
@@ -28,6 +30,9 @@ const Profile = () => {
   const { login } = useLogin({
     onComplete: async (user, isNewUser) => {
       await fetch("/api/register", { method: "POST" });
+      if (pathname === "/login" || pathname === "/") {
+        router.push("/feed");
+      }
     },
   });
 

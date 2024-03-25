@@ -19,6 +19,7 @@ const Posts = () => {
     return <div>Error: {error.message}</div>;
   }
 
+const PostSkeleton = () => {
   return (
     <>
       {isLoading ? (
