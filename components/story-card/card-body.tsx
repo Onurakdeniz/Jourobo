@@ -64,7 +64,7 @@ const CardBody = ({
         </div>
         <div className="flex-col flex gap-3 text-sm   font-light py-2 pr-2">
           <div className="flex-col flex w-full  text-base dark:text-neutral-400 text-neutral-600   text-balance overflow-hidden ">
-            {content?.content.split("\n\n").map((paragraph, index) => (
+            {content?.content?.split("\n\n").map((paragraph, index) => (
               <div key={index} className="mb-4 flex-wrap w-full flex leading-relax text-wrap text-justify overflow-hidden text-overflow-ellipsis whitespace-nowrap">
                 {paragraph}
               </div>
