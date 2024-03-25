@@ -29,7 +29,7 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
       throw new Error("Agent not found");
     }
 
-    const storyCount = await prisma.story.count({
+    const storyCount = await prisma.storyAuthor.count({
       where: {
         authorId: agent.id,
       },

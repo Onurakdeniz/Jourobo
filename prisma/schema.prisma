@@ -45,7 +45,7 @@ model Comment {
 
 model Vote {
   id        String   @id @default(uuid())
-  vote      VoteType  
+  vote      VoteType
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
@@ -148,25 +148,23 @@ model AIModel {
 }
 
 model Agent {
-  id               String            @id @default(uuid())
+  id               String          @id @default(uuid())
   agencyId         String
-  created          DateTime          @default(now())
-  updated          DateTime          @updatedAt
-  userName         String            @unique
-  agency           Agency            @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  created          DateTime        @default(now())
+  updated          DateTime        @updatedAt
+  userName         String          @unique
+  agency           Agency          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   followers        Follow[]
   points           Point[]
   profile          ProfileAgent?
   prompts          Prompt[]
-  storiesAuthored  Story[]           @relation("AuthoredStories")
-  storyContributions StoryContribution[]
+  storyAuthors     StoryAuthor[]
   tasks            Task[]
-  aiModels         AIModel[]         @relation("AgentToAIModel")
+  aiModels         AIModel[]       @relation("AgentToAIModel")
   defaultAiModelId String?
-  defaultAiModel   AIModel?          @relation("DefaultAIModelToAgent", fields: [defaultAiModelId], references: [id])
-  categories       AgentCategory[]   @relation("AgentToCategory")
+  defaultAiModel   AIModel?        @relation("DefaultAIModelToAgent", fields: [defaultAiModelId], references: [id])
+  categories       AgentCategory[] @relation("AgentToCategory")
 }
-
 
 model ProfileAgent {
   id                  String  @id @default(uuid())
@@ -190,45 +188,42 @@ model AgentCategory {
 // SOURCE AS TASK INPUT ///
 
 model Source {
-  id          String       @id @default(uuid())
-  createdAt   DateTime     @default(now())
-  agentId     String
-  runId       String
-  run         Run          @relation(fields: [runId], references: [id], onDelete: Cascade)
-  casts       FarcasterPosts[]
-} 
-
- 
+  id        String           @id @default(uuid())
+  createdAt DateTime         @default(now())
+  agentId   String
+  runId     String
+  run       Run              @relation(fields: [runId], references: [id], onDelete: Cascade)
+  casts     FarcasterPosts[]
+}
 
 model FarcasterPosts {
-  id          String   @id @default(uuid())
-  createdAt   DateTime @default(now())
-  sourceId    String
-  inputs      String
-  inputType   FarcasterInputType
-  source      Source   @relation(fields: [sourceId], references: [id])
-  limit      Int?
+  id           String             @id @default(uuid())
+  createdAt    DateTime           @default(now())
+  sourceId     String
+  inputs       String
+  inputType    FarcasterInputType
+  source       Source             @relation(fields: [sourceId], references: [id ], onDelete: Cascade) 
+  limit        Int?
   isWithRecast Boolean?
 }
 
-
 model Task {
-  id           String     @id @default(uuid())
-  agentId      String
-  createdAt    DateTime   @default(now())
-  isStaticRun Boolean    @default(true)
-  interval     Int?
-  state        TaskState? @default(ACTIVE)
-  description  String?
-  limit       Int?
-  isWithRecasts Boolean? @default(false)
-  name         String
-  Agent        Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  runs         Run[]
-  promptId     String
-  Prompt       Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
-  aiModelId    String
-  AIModel      AIModel    @relation(fields: [aiModelId], references: [id], onDelete: Cascade)
+  id            String     @id @default(uuid())
+  agentId       String
+  createdAt     DateTime   @default(now())
+  isStaticRun   Boolean    @default(true)
+  interval      Int?
+  state         TaskState? @default(ACTIVE)
+  description   String?
+  limit         Int?
+  isWithRecasts Boolean?   @default(false)
+  name          String
+  Agent         Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  runs          Run[]
+  promptId      String
+  Prompt        Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  aiModelId     String
+  AIModel       AIModel    @relation(fields: [aiModelId], references: [id], onDelete: Cascade)
 }
 
 model Run {
@@ -242,7 +237,7 @@ model Run {
   status       RunStatus   @default(CREATED)
   Task         Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   storyId      String
-  story        Story       @relation(fields: [storyId], references: [id] , onDelete: Cascade)
+  story        Story       @relation(fields: [storyId], references: [id], onDelete: Cascade)
   sources      Source[]
   cost         Float?
   tokens       Float?
@@ -253,7 +248,7 @@ model RunResult {
   id          String        @id @default(uuid())
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  run         Run           @relation(fields: [runId], references: [id])
+  run         Run           @relation(fields: [runId], references: [id] , onDelete: Cascade)
   runId       String
   sourcePost  SourcePost[]
   LLMResponse LLMResponse[]
@@ -271,9 +266,9 @@ model SourcePost {
   output      Json?
   hash        String
   authorId    String
-  author      SourceAuthor @relation(fields: [authorId], references: [id])
+  author      SourceAuthor @relation(fields: [authorId], references: [id] )
   runResultId String
-  runResult   RunResult    @relation(fields: [runResultId], references: [id])
+  runResult   RunResult    @relation(fields: [runResultId], references: [id] , onDelete: Cascade)
 }
 
 model SourceAuthor {
@@ -305,7 +300,7 @@ model LLMResponse {
   content           LLMContent[]
   runId             String
   runResultId       String
-  runResult         RunResult    @relation(fields: [runResultId], references: [id])
+  runResult         RunResult    @relation(fields: [runResultId], references: [id] , onDelete: Cascade)
   output            Json?
   toolCalls         ToolCall[]
 }
@@ -325,7 +320,7 @@ model LLMContent {
   llmResponse   LLMResponse            @relation(fields: [LLMResponseId], references: [id], onDelete: Cascade)
 }
 
-  // add embedding later
+// add embedding later
 
 model Category {
   id          String                 @id @default(uuid())
@@ -339,7 +334,7 @@ model CategoryOnLLMContent {
   categoryId   String
   llmContentId String
   category     Category   @relation(fields: [categoryId], references: [id])
-  llmContent   LLMContent @relation(fields: [llmContentId], references: [id])
+  llmContent   LLMContent @relation(fields: [llmContentId], references: [id], onDelete: Cascade)
 
   @@id([categoryId, llmContentId])
 }
@@ -363,10 +358,10 @@ model Tag {
 }
 
 model TagOnLLMContent {
-  tagId       String
+  tagId        String
   llmContentId String
-  tag         Tag      @relation(fields: [tagId], references: [id])
-  llmContent  LLMContent @relation(fields: [llmContentId], references: [id])
+  tag          Tag        @relation(fields: [tagId], references: [id])
+  llmContent   LLMContent @relation(fields: [llmContentId], references: [id] , onDelete: Cascade)
 
   @@id([tagId, llmContentId])
 }
@@ -375,7 +370,7 @@ model ToolCall {
   id            String      @id @default(uuid())
   type          String
   function      Json
-  LLMResponse   LLMResponse @relation(fields: [LLMResponseId], references: [id])
+  LLMResponse   LLMResponse @relation(fields: [LLMResponseId], references: [id] , onDelete: Cascade)
   LLMResponseId String
 }
 
@@ -396,7 +391,7 @@ model Prompt {
   tasks          Task[]
   agent          Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
   promptMessage  PromptMessage[]
- systemMessage  SystemMessage[]
+  systemMessage  SystemMessage[]
 }
 
 model PromptMessage {
@@ -406,7 +401,7 @@ model PromptMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   promptId  String
-  prompt    Prompt   @relation(fields: [promptId], references: [id])
+  prompt    Prompt   @relation(fields: [promptId], references: [id] , onDelete: Cascade)
 }
 
 model SystemMessage {
@@ -439,30 +434,31 @@ model Function {
 //////////////// LLM INPUT END  ///////////////////////
 
 model Story {
-  id                String              @id @default(uuid())
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  views             Int                 @default(0)
-  status            String?             @default("INITIALIZED")
-  type              String?
-  bookmarks         Bookmark[]
-  comments          Comment[]
-  points            Point[]
-  bookmarkAmount    Int                 @default(0)
-  voteAmount         Int                 @default(0)
-  votes             Vote[]
-  runs              Run[]
-  authorId          String
-  author            Agent               @relation("AuthoredStories", fields: [authorId], references: [id]  )
-  storyContributions StoryContribution[]
+  id             String        @id @default(uuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  views          Int           @default(0)
+  status         String?       @default("INITIALIZED")
+  type           String?
+  bookmarks      Bookmark[]
+  comments       Comment[]
+  points         Point[]
+  bookmarkAmount Int           @default(0)
+  voteAmount     Int           @default(0)
+  votes          Vote[]
+  runs           Run[]
+  storyAuthors   StoryAuthor[]
 }
 
-model StoryContribution {
-  storyId String
-  story   Story @relation(fields: [storyId], references: [id] ,  onDelete: Cascade)
-  agentId String
-  agent   Agent @relation(fields: [agentId], references: [id] , onDelete: Cascade) // arrange here later * delete cascade
-  @@id([storyId, agentId])
+model StoryAuthor {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      String // "STARTER" or "CONTRIBUTOR"
+  storyId   String
+  story     Story    @relation(fields: [storyId], references: [id])
+  authorId  String?
+  author    Agent?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 }
 
 model Point {
@@ -502,10 +498,6 @@ enum RunStatus {
 }
 
 enum Status {
-
   INITIALIZED
   CREATED
 }
-
-
- 

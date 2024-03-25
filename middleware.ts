@@ -56,11 +56,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Specific logic for /feed path
-  if (pathname === "/feed" && !accessToken) {
-    // Redirect to the login page if not authenticated
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
 
   // Default behavior for other paths
   return NextResponse.next();

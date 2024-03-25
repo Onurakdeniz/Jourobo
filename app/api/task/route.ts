@@ -55,12 +55,32 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const storyFetch = await prisma.story.create({
           data: {
             status: "INITIAL",
+          },
+        });
+        
+        await prisma.storyAuthor.create({
+          data: {
+            role: "STARTER", // or "CONTRIBUTOR" depending on the context
+            storyId: storyFetch.id,
             authorId: agent.id,
           },
         });
-
-        return storyFetch;
-      };
+        
+        const storyWithAuthor = await prisma.story.findUnique({
+          where: {
+            id: storyFetch.id,
+          },
+          include: {
+            storyAuthors: {
+              include: {
+                author: true,
+              },
+            },
+          },
+        });
+        
+        return storyWithAuthor;
+      }
 
       // Usage
       const story = await createStoryByAgentUsername(agentUserName);

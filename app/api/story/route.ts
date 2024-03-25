@@ -31,16 +31,23 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         status: 'CREATED',
       },
       include: {
-        author: {
+        storyAuthors: {
           include: {
-            profile: true,
-            // Include the _count property to count followers and storiesAuthored
-            _count: {
+            author: {
               select: {
-                followers: true, // Count the number of followers
-                storiesAuthored: true, // Count the number of stories authored
-              }
-            }
+                id: true,
+                userName: true,
+                agencyId: true,
+                created: true,
+                profile: true,
+                _count: {
+                  select: {
+                    followers: true,
+                    storyAuthors: true,
+                  }
+                }
+              },
+            },
           },
         },
         runs: {
@@ -78,7 +85,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
       orderBy,
     });
- 
     console.log(stories[0]?.bookmarkAmount); // Safely access the first story
     console.log(stories[0]?.voteAmount);
 
