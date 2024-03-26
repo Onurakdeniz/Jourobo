@@ -12,7 +12,8 @@ export const useSaveStatus = (storyId: string): UseQueryResult<SaveStatusRespons
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json();
+      const data = await response.json();
+      return 'isBookmarked' in data ? data : { isBookmarked: false };
     },
     // Additional options can be specified here
   });

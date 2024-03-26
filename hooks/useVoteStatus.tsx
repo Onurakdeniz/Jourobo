@@ -3,7 +3,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
 interface VoteStatusResponse {
   voteType: 'UP' | 'DOWN' | null;
 }
-
+ 
 export const useVoteStatus = (storyId: string): UseQueryResult<VoteStatusResponse, Error> => {
   return useQuery<VoteStatusResponse, Error>({
     queryKey: ['voteStatus', storyId],
@@ -13,7 +13,7 @@ export const useVoteStatus = (storyId: string): UseQueryResult<VoteStatusRespons
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
- 
+      console.log ('datafota', data);
       return data;
     },
   });

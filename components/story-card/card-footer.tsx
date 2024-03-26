@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useVoteMutation } from "@/hooks/useVoteMutation";
 import { useSaveMutation } from "@/hooks/useSaveMutation";
 import { useVoteStatus } from "@/hooks/useVoteStatus";
@@ -22,31 +22,55 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
     useSaveStatus(storyId);
   const { mutate: toggleSave, isPending: isSavePending } = useSaveMutation();
 
-  const [localBookmarks, setLocalBookmarks] = useState(bookMarks); // Example initial state
+  const [localBookmarks, setLocalBookmarks] = useState(bookMarks);
+  const [localBookmarkStatus, setLocalBookmarkStatus] = useState(
+    saveStatus?.isBookmarked
+  );
   const [localViews, setLocalViews] = useState(views); // Example initial state
-  const [localVotes, setLocalVotes] = useState(vote); // Example initial state
 
-  const handleVote = (voteAction: any) => {
+  const [voteStatusState, setVoteStatusState] = useState(voteStatus);
+  const [localVotes, setLocalVotes] = useState(vote);
+
+  console.log("voteStatus", voteStatus);
+  console.log("voteStatusState", voteStatusState);
+  console.log("localBookmarkStatus", localBookmarkStatus);
+
+  const handleVote = (voteAction: "UP" | "DOWN") => {
     toggleVote(
       { storyId, voteAction },
       {
         onSuccess: () => {
+          let voteIncrement = 0;
+          if (voteStatusState === null) {
+            voteIncrement = voteAction === "UP" ? 1 : -1;
+          } else if (voteStatusState === "UP") {
+            voteIncrement = voteAction === "UP" ? -1 : -2;
+          } else if (voteStatusState === "DOWN") {
+            voteIncrement = voteAction === "UP" ? 2 : 1;
+          }
+
+          setVoteStatusState(prevState => 
+            prevState === voteAction ? null : voteAction
+          );
+          setLocalVotes(prev => prev + voteIncrement);
           refetchVoteStatus();
         },
       }
     );
   };
 
-  console.log("save", saveStatus);
   const handleBookmarkToggle = () => {
-    const action = saveStatus?.isBookmarked ? "save" : "unsave";
     toggleSave(
-      { storyId, action },
+      { storyId },
       {
         onSuccess: () => {
-          refetchSaveStatus();
+          // Toggle the local bookmark status
+          setLocalBookmarkStatus((prev) => !prev);
+
+          // Update the local bookmarks count based on the new status
+          // Assuming localBookmarkStatus is true when the story is currently bookmarked (before toggling)
           setLocalBookmarks((prev) =>
-            action === "unsave" ? prev + 1 : Math.max(0, prev - 1)
+            localBookmarkStatus ? Math.max(0, prev - 1) : prev + 1
           );
         },
       }
@@ -60,27 +84,21 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
           variant="ghost"
           size="sm"
           className={`h-6 ${
-            voteStatus?.voteType === "DOWN" ? "text-orange-600" : ""
+            voteStatusState === "DOWN" ? "text-orange-600" : "text-white"
           }`}
-          onClick={() =>
-            handleVote(voteStatus?.voteType === "DOWN" ? "NONE" : "DOWN")
-          }
+          onClick={() => handleVote("DOWN")}
           disabled={isVotePending}
         >
           <CircleArrowDown size={16} />
         </Button>
-
         <div className="text-xs font-bold">{localVotes}</div>
-
         <Button
           variant="ghost"
           size="sm"
           className={`h-6 ${
-            voteStatus?.voteType === "UP" ? "text-orange-600" : ""
+            voteStatusState === "UP" ? "text-orange-600" : "text-white"
           }`}
-          onClick={() =>
-            handleVote(voteStatus?.voteType === "UP" ? "NONE" : "UP")
-          }
+          onClick={() => handleVote("UP")}
           disabled={isVotePending}
         >
           <CircleArrowUp size={16} />
@@ -97,7 +115,7 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
         >
           {isSavePending ? (
             <Loader2 className="animate-spin" size={16} />
-          ) : saveStatus?.isBookmarked ? (
+          ) : localBookmarkStatus ? (
             <BookmarkCheck size={16} />
           ) : (
             <Bookmark size={16} />

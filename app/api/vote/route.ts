@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
     if (!storyId || !voteAction) {
       return NextResponse.json({ error: "Missing storyId or voteAction" }, { status: 400 });
     }
-
     if (!['UP', 'DOWN'].includes(voteAction.toUpperCase())) {
       return NextResponse.json({ error: "Invalid voteAction. Must be 'UP' or 'DOWN'" }, { status: 400 });
     }
@@ -29,16 +28,34 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (existingVote) {
-      if (existingVote.vote === voteAction.toUpperCase()) {
-        // If the current vote matches the action, delete the vote
-        await prisma.vote.delete({
-          where: {
-            id: existingVote.id,
+    if (!existingVote) {
+      if (voteAction.toUpperCase() === 'UP') {
+        await prisma.vote.create({
+          data: {
+            userId: currentUser.id,
+            storyId: storyId,
+            vote: 'UP',
           },
         });
-
-        // Update the voteAmount in the Story model
+        await prisma.story.update({
+          where: {
+            id: storyId,
+          },
+          data: {
+            voteAmount: {
+              increment: 1,
+            },
+          },
+        });
+        return NextResponse.json({ message: "Vote added successfully" }, { status: 200 });
+      } else if (voteAction.toUpperCase() === 'DOWN') {
+        await prisma.vote.create({
+          data: {
+            userId: currentUser.id,
+            storyId: storyId,
+            vote: 'DOWN',
+          },
+        });
         await prisma.story.update({
           where: {
             id: storyId,
@@ -49,56 +66,88 @@ export async function POST(req: NextRequest) {
             },
           },
         });
-
-        return NextResponse.json({ message: `Vote deleted successfully` }, { status: 200 });
-      } else {
-        // If the current vote does not match the action, update the vote
-        const updatedVote = await prisma.vote.update({
-          where: {
-            id: existingVote.id,
-          },
-          data: {
-            vote: voteAction.toUpperCase(),
-          },
-        });
-
-        // Update the voteAmount in the Story model based on the vote change
-        await prisma.story.update({
-          where: {
-            id: storyId,
-          },
-          data: {
-            voteAmount: {
-              increment: voteAction.toUpperCase() === 'UP' ? 2 : -2,
-            },
-          },
-        });
-
-        return NextResponse.json({ message: `Vote updated successfully`, vote: updatedVote }, { status: 200 });
+        return NextResponse.json({ message: "Vote added successfully" }, { status: 200 });
       }
     } else {
-      // If no vote exists, create a new one
-      const newVote = await prisma.vote.create({
-        data: {
-          userId: currentUser.id,
-          storyId: storyId,
-          vote: voteAction.toUpperCase(),
-        },
-      });
-
-      // Update the voteAmount in the Story model
-      await prisma.story.update({
-        where: {
-          id: storyId,
-        },
-        data: {
-          voteAmount: {
-            increment: 1,
-          },
-        },
-      });
-
-      return NextResponse.json({ message: "Vote added successfully", vote: newVote }, { status: 200 });
+      if (existingVote.vote === 'UP') {
+        if (voteAction.toUpperCase() === 'UP') {
+          await prisma.vote.delete({
+            where: {
+              id: existingVote.id,
+            },
+          });
+          await prisma.story.update({
+            where: {
+              id: storyId,
+            },
+            data: {
+              voteAmount: {
+                decrement: 1,
+              },
+            },
+          });
+          return NextResponse.json({ message: "Vote deleted successfully" }, { status: 200 });
+        } else if (voteAction.toUpperCase() === 'DOWN') {
+          await prisma.vote.update({
+            where: {
+              id: existingVote.id,
+            },
+            data: {
+              vote: 'DOWN',
+            },
+          });
+          await prisma.story.update({
+            where: {
+              id: storyId,
+            },
+            data: {
+              voteAmount: {
+                decrement: 2,
+              },
+            },
+          });
+          return NextResponse.json({ message: "Vote updated successfully" }, { status: 200 });
+        }
+      } else if (existingVote.vote === 'DOWN') {
+        if (voteAction.toUpperCase() === 'DOWN') {
+          await prisma.vote.delete({
+            where: {
+              id: existingVote.id,
+            },
+          });
+          await prisma.story.update({
+            where: {
+              id: storyId,
+            },
+            data: {
+              voteAmount: {
+                increment: 1,
+              },
+            },
+          });
+          return NextResponse.json({ message: "Vote deleted successfully" }, { status: 200 });
+        } else if (voteAction.toUpperCase() === 'UP') {
+          await prisma.vote.update({
+            where: {
+              id: existingVote.id,
+            },
+            data: {
+              vote: 'UP',
+            },
+          });
+          await prisma.story.update({
+            where: {
+              id: storyId,
+            },
+            data: {
+              voteAmount: {
+                increment: 2,
+              },
+            },
+          });
+          return NextResponse.json({ message: "Vote updated successfully" }, { status: 200 });
+        }
+      }
     }
   } catch (error) {
     console.error('Failed to process vote:', error);

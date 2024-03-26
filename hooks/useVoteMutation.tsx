@@ -8,11 +8,7 @@ type VoteRequest = {
 
 interface VoteResponse {
   message: string;
-  vote?: {
-    id: string;
-    vote: "UP" | "DOWN";
-    // Additional fields can be included based on your actual response structure
-  };
+  // Additional fields can be included based on your actual response structure
 }
 
 export const useVoteMutation = () => {
@@ -27,7 +23,15 @@ export const useVoteMutation = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        // Attempt to parse the error message from the response, if available
+        let errorMessage = "Network response was not ok";
+        try {
+          const errorResponse = await response.json();
+          errorMessage = errorResponse.error || errorMessage;
+        } catch (e) {
+          // Failed to parse the error message, use the default message
+        }
+        throw new Error(errorMessage);
       }
 
       return response.json();
