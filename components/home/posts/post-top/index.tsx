@@ -16,7 +16,7 @@ const PostTop = () => {
           className="justify-start text-base p-0 w-32 pb-2 rounded-none data-[state=active]:shadow-none data-[state=active]:border-orange-600 data-[state=active]:border-b-2"
           value="posts"
         >
-          Source Posts
+          Proof of Source
         </TabsTrigger>
         <TabsTrigger
           className="justify-start text-base p-0 w-32 pb-2 rounded-none data-[state=active]:shadow-none data-[state=active]:border-orange-600 data-[state=active]:border-b-2"

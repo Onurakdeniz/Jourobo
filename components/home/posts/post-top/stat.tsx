@@ -1,4 +1,4 @@
-import {UserList} from "@/components/story-card/user-list";
+import { UserList } from "@/components/story-card/user-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { usePostStore } from "@/store/posts";
@@ -17,7 +17,6 @@ import React from "react";
 import { CircleArrowUp, Eye, MessageSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-
 const calculateTimeDifference = (dateString: any) => {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) {
@@ -33,9 +32,6 @@ const PostsStat = () => {
   if (storyInformation && storyInformation.createdAt) {
     storyDate = calculateTimeDifference(storyInformation.createdAt);
   }
-
- 
-  
 
   return (
     <div className="flex-col flex gap-2">
@@ -65,7 +61,7 @@ const PostsStat = () => {
                   className="flex px-1 gap-2 border-none rounded-none font-normal"
                 >
                   <CircleArrowUp size={16} />
-             {storyInformation?.voteAmount}
+                  {storyInformation?.voteAmount}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
@@ -74,7 +70,6 @@ const PostsStat = () => {
             </Tooltip>
           </TooltipProvider>
 
-           
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -92,20 +87,49 @@ const PostsStat = () => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        
       </div>
       <div className="flex gap-2 items-center pt-2">
-      <div className=" text-sm items-center">
-  {sourceState?.inputType === 'FARCASTER_CHANNEL'
-    ? <div className="items-center flex gap-1"><span className="  font-normal"> Channel Name</span> <Badge  variant="outline" className="ml-2 px-3 py-1 text-orange-600  capitalize"> {sourceState.sourceId} </Badge></div>
-    : sourceState?.inputType === 'FARCASTER_USER'
-    ? <div className="items-center flex gap-1"><span className="  font-normal"> Farcaster User Ids : </span> <Badge  variant="outline" className="ml-2 px-3 py-1 text-orange-600  capitalize"> {sourceState.sourceId} </Badge></div>  
-    : <div className="items-center flex gap-1"><span className="  font-normal"> Farcaster Url : </span> 
-    <a href={sourceState.sourceId } target="_blank" >  
-    <Badge  variant="outline" className="ml-2 px-3 py-1 text-orange-600 "> {sourceState.sourceId} </Badge> </a>
-    
-    </div>   }
+        <div className=" text-sm items-center">
+          {sourceState?.inputType === "FARCASTER_CHANNEL" ? (
+            <div className="items-center flex gap-1">
+              <span className="  font-normal"> Channel Name</span>{" "}
+              <Badge
+                variant="default"
+                className="ml-2 px-3 py-1    capitalize"
+              >
+                {" "}
+                {sourceState.sourceId}{" "}
+              </Badge>
+            </div>
+          ) : sourceState?.inputType === "FARCASTER_USER" ? (
+            <div className="items-center flex gap-1">
+              <span className="  font-normal"> Farcaster User Ids : </span>{" "}
+              <Badge
+                variant="default"
+                className="ml-2 px-3 py-1   capitalize"
+              >
+                {" "}
+                {sourceState.sourceId}{" "}
+              </Badge>
+            </div>
+          ) : (
+            <div className="  flex gap-1">
+          <div className="flex flex-col gap-2">
+  {sourceState.sourceId.split(',').map((id, index) => (
+    <a key={index} href={id.trim()} target="_blank" rel="noopener noreferrer">
+      <Badge
+        variant="default"
+        className="py-1 "
+      >
+        {id.trim()}
+      </Badge>
+    </a>
+  ))}
 </div>
+          
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

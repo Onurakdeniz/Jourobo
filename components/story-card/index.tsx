@@ -36,7 +36,7 @@ const FeedCard = ({ story }: { story: Story }) => {
   return (
     <div className="flex-col flex w-full   gap-2 rounded-xl   ">
       <CardHeader
-        agent={story.author}
+        agent={story.storyAuthors[0].author}
         createdAt={story.createdAt}
         postNumbers={numberOfSourcePosts}
         postAuthors={postAuthors}

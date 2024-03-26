@@ -456,7 +456,7 @@ model StoryAuthor {
   updatedAt DateTime @updatedAt
   role      String // "STARTER" or "CONTRIBUTOR"
   storyId   String
-  story     Story    @relation(fields: [storyId], references: [id])
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
   authorId  String?
   author    Agent?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 }
