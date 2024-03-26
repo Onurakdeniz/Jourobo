@@ -112,22 +112,8 @@ const PostsStat = () => {
                 {sourceState.sourceId}{" "}
               </Badge>
             </div>
-          ) : (
-            <div className="  flex gap-1">
-          <div className="flex flex-col gap-2">
-  {sourceState.sourceId.split(',').map((id, index) => (
-    <a key={index} href={id.trim()} target="_blank" rel="noopener noreferrer">
-      <Badge
-        variant="default"
-        className="py-1 "
-      >
-        {id.trim()}
-      </Badge>
-    </a>
-  ))}
-</div>
-          
-            </div>
+          ) : ( null
+           
           )}
         </div>
       </div>

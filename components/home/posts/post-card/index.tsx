@@ -18,6 +18,7 @@ const PostCard = (
       authorAvatar={post.authorAvatar}
       postCreatedAt = {post.postCreatedAt}
       authorUserName = {post.authorUserName}
+      hash = {post.postHash}
       
       />
       <PostCardBody 

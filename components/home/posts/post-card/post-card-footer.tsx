@@ -8,7 +8,7 @@ const PostCardFooter = (
   }
 ) => {
   return (
-    <div className="flex gap-4  border-b py-2">
+    <div className="flex gap-4 py-2">
       <div className="flex gap-1 items-center  py-1 rounded-md">
         <ThumbsUp size={14} />
         <div className="text-xs">

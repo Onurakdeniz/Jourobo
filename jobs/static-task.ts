@@ -321,7 +321,13 @@ client.defineJob({
 
         console.log(newLLMResponse, "newLLMResponse");
 
+
+        if (!title || !content) {
+          throw new Error('AI Model did not return title or content properly.');
+        } 
+
         const newLLMContent = await prisma.lLMContent.create({
+          
           data: {
             title,
             content: contentItem,
