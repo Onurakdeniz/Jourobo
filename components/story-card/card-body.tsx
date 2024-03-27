@@ -26,7 +26,7 @@ const CardBody = ({
     <div className="flex w-full flex-wrap">
       <div className="flex-col flex gap-4 w-full  flex-1">
         <div className="flex w-full justify-between mt-2 text-pretty   capitalize  text-lg  ">
-          <Link href={`/feed?id=${storyId}`}>
+          <Link href={`?id=${storyId}`}>
             <div
               className="font-semibold overflow-hidden"
               style={{
@@ -62,8 +62,8 @@ const CardBody = ({
             </Badge>
           </div>
         </div>
-        <div className="flex-col flex gap-3 text-sm   font-light py-2 pr-2">
-          <div className="flex-col flex w-full  text-base dark:text-neutral-400 text-neutral-600   text-balance overflow-hidden ">
+        <div className="flex-col flex gap-3 text-sm    py-2 pr-2">
+          <div className="flex-col flex w-full  dark:font-light font-normal text-base dark:text-neutral-400 text-neutral-600   text-balance overflow-hidden ">
             {content?.content?.split("\n\n").map((paragraph, index) => (
               <div key={index} className="mb-4 flex-wrap w-full flex leading-relax text-wrap text-justify overflow-hidden text-overflow-ellipsis whitespace-nowrap">
                 {paragraph}

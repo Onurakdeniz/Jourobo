@@ -26,9 +26,7 @@ const Feed = () => {
     setCurrentTab(tab);
   };
 
-  const { storiesState, isLoading, error, refetch } =
-    useFetchStories(currentTab);
-
+  const { storiesState, isLoading, error, refetch } = useFetchStories({ sortType: currentTab });
   useEffect(() => {
     if (storiesState.length > 0) {
       router.push(`feed/?id=${storiesState[0].id}`);

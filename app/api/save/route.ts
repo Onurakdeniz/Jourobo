@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import { authMiddleware } from "@/lib/authMiddleware";
 
 export async function POST(req: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // Parse the request body to get storyId
     const requestBody = await req.json();
     const { storyId } = requestBody;
-    console.log('storyId', storyId);
+    console.log("storyId", storyId);
     if (!storyId) {
       return NextResponse.json({ error: "Missing storyId" }, { status: 400 });
     }
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId: currentUser.id,
           storyId: storyId,
-          bookmarked : true,
+          bookmarked: true,
         },
       });
 
@@ -50,7 +50,10 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({ message: "Story saved successfully", bookmark: newBookmark }, { status: 200 });
+      return NextResponse.json(
+        { message: "Story saved successfully", bookmark: newBookmark },
+        { status: 200 }
+      );
     } else {
       // If a bookmark exists, delete it
       await prisma.bookmark.delete({
@@ -71,10 +74,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({ message: "Story unsaved successfully" }, { status: 200 });
+      return NextResponse.json(
+        { message: "Story unsaved successfully" },
+        { status: 200 }
+      );
     }
   } catch (error) {
-    console.error('Failed to toggle save/unsave story:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Failed to toggle save/unsave story:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
+

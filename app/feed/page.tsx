@@ -4,6 +4,8 @@ import Feed from '@/components/home/feed'
 import Posts from '@/components/home/posts'
 import React, { Suspense } from 'react'
 
+
+
 const page = () => {
   return (
     <div className="flex h-full   md:mt-2  w-full" >

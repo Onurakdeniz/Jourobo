@@ -1,24 +1,43 @@
-"use client";
-import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
+import { useBookmarksStore } from "@/store/bookmarks";
 import { useStoryStore } from "@/store/story";
- 
+import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 
-export const useFetchStories = (sortType: string) => {
-  const storiesState = useStoryStore((state) => state.stories);
+interface FetchStoriesOptions {
+  sortType?: string;
+  bookmarked?: boolean;
+}
+
+export const useFetchStories = (options: FetchStoriesOptions = {}) => {
   const setStories = useStoryStore((state) => state.setStories);
- 
-  // Function to fetch stories data
+  const setBookmarkedStories = useBookmarksStore((state) => state.setBookmarks);
+  const bookmarksStore = useBookmarksStore((state) => state.bookmarks);
+  const storiesStore = useStoryStore((state) => state.stories);
+
   const fetchStoriesData = async ({
     queryKey,
-  }: QueryFunctionContext<[string, { sortType: string }]>) => {
-    const [_key, { sortType }] = queryKey;
-    const response = await fetch(`/api/story?sort=${sortType}`);
+  }: QueryFunctionContext<[string, FetchStoriesOptions]>) => {
+    const { sortType, bookmarked } = queryKey[1];
+
+    let url;
+
+    if (options.bookmarked) {
+ 
+      url = "/api/story/bookmarked"; 
+    } else {
+      url = "/api/story";  
+      if (options.sortType) {
+ 
+        url += `?${new URLSearchParams({ sort: options.sortType }).toString()}`;
+      }
+    }
+
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error("Stories fetch failed!");
     }
-    const data = await response.json();
-    return data;
+
+    return response.json();
   };
 
   const {
@@ -28,19 +47,22 @@ export const useFetchStories = (sortType: string) => {
     refetch,
     isSuccess,
   } = useQuery({
-    queryKey: ["stories", { sortType }],
+    queryKey: ["stories", options],
     queryFn: fetchStoriesData,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
 
- 
-
-  // Set stories in global state if query was successful
+  // Set stories in the appropriate global state if query was successful
   if (isSuccess && stories) {
-    setStories(stories);
+    if (options.bookmarked) {
+      setBookmarkedStories(stories);
+    } else {
+      setStories(stories);
+    }
   }
 
-  // Return necessary variables for component consumption
+  const storiesState = options.bookmarked ? bookmarksStore : storiesStore;
+
   return { storiesState, isLoading, error, refetch };
 };
