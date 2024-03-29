@@ -340,7 +340,7 @@ const CreateAgentBody = () => {
                       <Textarea
                         readOnly
                         className="h-32 mt-6"
-                        value={selectedPrompt.title}
+                        value={selectedPrompt.content}
                       />
                     )}
                     <FormDescription>

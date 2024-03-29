@@ -4,7 +4,7 @@ import { useAgentStore } from "@/store/agent";
  
 
 // Updated to accept a `type` parameter
-export const useFetchAgents = (type = "latest") => {
+export const useFetchAgents = (type = "trending") => {
   async function fetchAgentsData({ queryKey }: QueryFunctionContext<any>) {
     // Extract agentUserName from the queryKey
     const [_key, { type }] = queryKey;

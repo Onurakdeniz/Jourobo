@@ -463,6 +463,12 @@ export const AgentSchema: z.ZodType<Agent> = z
   })
   .strict();
 
+  export const OwnerProfileSchema = z.object({
+    fid: z.number().int(),
+    userName: z.string(),
+    avatarUrl: z.string().optional(),
+  });
+
 export const getAgentByAgentUserNameSchema = z.object({
   createdAt: z.date(),
   id: z.string(),
@@ -475,6 +481,7 @@ export const getAgentByAgentUserNameSchema = z.object({
   storyCount: z.number().int(),
   categories: z.array(z.lazy(() => CategorySchema)).optional(),
   profile: z.lazy(() => ProfileAgentSchema),
+ ownerProfiles: z.array(OwnerProfileSchema).optional(),
 });
 
 export const AIModelSchemaWithoutId = AIModelSchema.omit({

@@ -16,6 +16,7 @@ import { useBookmarkedStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useFetchStories } from "@/hooks/useFetchStories";
+import { set } from "date-fns";
 
 const CardFooter = ({ storyId, views, vote, bookMarks }) => {
   const pathname = usePathname();
@@ -24,11 +25,14 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
     useVoteStatus(storyId);
   const { mutate: toggleVote, isPending: isVotePending } = useVoteMutation();
 
-  const { isBookmarked , refetch: refetchSaveStatus } =
-    useSaveStatus(storyId);
+  const { isBookmarked, refetch: refetchSaveStatus } = useSaveStatus(storyId);
   const { mutate: toggleSave, isPending: isSavePending } = useSaveMutation();
-  const { storiesState, isLoading, error, refetch : refetchBookmarks } =
-  useFetchStories( {bookmarked: true});
+  const {
+    storiesState,
+    isLoading,
+    error,
+    refetch: refetchBookmarks,
+  } = useFetchStories({ bookmarked: true });
   const [localBookmarks, setLocalBookmarks] = useState(bookMarks);
 
   const [localViews, setLocalViews] = useState(views); // Example initial state
@@ -40,7 +44,12 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
     setIsBookMarked(isBookmarked);
   }, [isBookmarked]);
 
- 
+  useEffect (() => {
+    setLocalBookmarks(bookMarks);
+    setLocalViews(views);
+    setLocalVotes(vote);
+  }
+  , [bookMarks, views, vote]);
 
   const handleVote = (voteAction: "UP" | "DOWN") => {
     toggleVote(
@@ -147,7 +156,9 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
             <Bookmark size={20} />
           )}
         </Button>
-        <div className="text-base flex gap-1 items-center">{localBookmarks}</div>
+        <div className="text-base flex gap-1 items-center">
+          {localBookmarks}
+        </div>
       </div>
     </div>
   );

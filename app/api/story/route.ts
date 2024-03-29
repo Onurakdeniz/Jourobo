@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "@/lib/authMiddleware";
 import { Prisma } from "@prisma/client";
-
+import { subDays } from 'date-fns';
 // GET Handler
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
@@ -12,24 +12,28 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
-    const pageSize = 10;
+    const pageSize = 100;
     const skip = (page - 1) * pageSize;
     const sort = req.nextUrl.searchParams.get("sort");
 
     let orderBy: Prisma.StoryOrderByWithRelationInput[];
     if (sort === "trending") {
-      orderBy = [{ votes: { _count: 'desc' } }];
+      orderBy = [{ voteAmount: 'desc' }]; 
     } else {
       orderBy = [{ createdAt: 'desc' }];
     }
     
-    
+    const sevenDaysAgo = subDays(new Date(), 7);
     const stories = await prisma.story.findMany({
       skip,
       take: pageSize,
       where: {
         status: 'CREATED',
+        createdAt: {
+          gte: sevenDaysAgo,
+        },
       },
+      orderBy,
       include: {
         storyAuthors: {
           include: {
@@ -83,7 +87,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           },
         },
       },
-      orderBy,
+    
     });
     console.log(stories[0]?.bookmarkAmount); // Safely access the first story
     console.log(stories[0]?.voteAmount);

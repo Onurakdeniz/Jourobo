@@ -28,18 +28,7 @@ const AgentListItem = ({ agent }: { agent: any }) => {
     <div className="flex justify-between items-center h-8">
       <AgentName agentValue={agent} createdAt={createdAt} isNavbar={true} />
       <div className="flex gap-2 items-center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge variant="outline" className="rounded-xl  font-bold    ">
-                {agent.followersCount}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Number of Followers</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        
       </div>
     </div>
   );

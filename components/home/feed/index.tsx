@@ -45,8 +45,9 @@ const Feed = () => {
         {currentTab === "myfeed" && (
           <div className="mt-4 flex w-full h-16   items-center space-x-6">
             <Textarea
+            disabled
               placeholder="
-        Text your feed algorithm"
+        Write your own feed algorithm"
             />
             <Button variant={"outline"} disabled>
               Filter{" "}

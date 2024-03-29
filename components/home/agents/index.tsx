@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,19 +15,25 @@ import { Skeleton } from "@/components/ui/skeleton";
 const Agents = () => {
   const pathname = usePathname();
   const showTrendingAgents = pathname === "/feed";
-  // Assuming useFetchAgents hook is correctly implemented to fetch and return agents list
-  const { agentList, isLoading, error, refetch } = useFetchAgents(
-    showTrendingAgents ? "trending" : "latest"
-  );
+  const [activeTab, setActiveTab] = React.useState <string> ("");
 
+  const { agentList, isLoading, error, refetch } = useFetchAgents(activeTab);
+  console.log("activeTab", activeTab)
+
+ 
   return (
     <>
       {showTrendingAgents && (
         <>
-          <Tabs defaultValue="trending" className="border-t mt-2 h-full">
+          <Tabs
+            defaultValue="trending"
+            className="border-t mt-2 h-full"
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value)}
+          >
             <TabsList className="flex gap-2 px-0 justify-start w-full bg-background mt-4">
               <TabsTrigger
-                  className="justify-center items-center rounded-full text-xs px-4   py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
+                className="justify-center items-center rounded-full text-xs px-4   py-1 data-[state=active]:dark:bg-orange-950 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
                 value="trending"
               >
                 Trending Agents

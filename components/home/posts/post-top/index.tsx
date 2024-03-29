@@ -21,7 +21,7 @@ const PostTop = () => {
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.value}
-            className="justify-center items-center rounded-full text-sm px-4   w-42  py-1    border data-[state=active]:font-bold data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
+            className="justify-center items-center rounded-full text-sm px-4   w-42  py-1    border data-[state=active]:font-semibold   data-[state=active]:shadow-none   "
             value={tab.value}
             disabled={tab.disabled}
           >

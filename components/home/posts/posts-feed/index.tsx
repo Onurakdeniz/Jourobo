@@ -24,20 +24,20 @@ const PostFeed = ({ postsState }: { postsState: any }) => {
 
     return dateB.getTime() - dateA.getTime();
   });
- 
+
   return (
     <>
       <Tabs defaultValue="top" className="w-full">
         <TabsList className="grid w-full grid-cols-2 gap-6 bg-background  px-0">
           <TabsTrigger
             value="top"
-            className="justify-center items-center rounded-full text-xs px-4     py-1    border data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
+            className="justify-center items-center rounded-full text-xs px-4     py-1    border data-[state=active]:font-bold data-[state=active]:shadow-none   "
           >
             Top{" "}
           </TabsTrigger>
           <TabsTrigger
             value="date"
-            className="justify-center items-center rounded-full text-xs px-4     py-1    border data-[state=active]:text-orange-600 data-[state=active]:shadow-none   "
+            className="justify-center items-center rounded-full text-xs px-4     py-1    border   data-[state=active]:font-bold data-[state=active]:shadow-none   "
           >
             Last Date
           </TabsTrigger>
@@ -53,7 +53,7 @@ const PostFeed = ({ postsState }: { postsState: any }) => {
               ))}
             </div>
           </TabsContent>
-          <TabsContent value="date" >
+          <TabsContent value="date">
             <div className="flex-col flex gap-4 ">
               {dateSort.map((post) => (
                 <PostCard key={post.id} post={post} />

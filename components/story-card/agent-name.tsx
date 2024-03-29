@@ -105,7 +105,7 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
             </Avatar>
             <Link href={`/agent/${agentValue?.userName}`}>
               <div className="text-sm capitalize hover:cursor-pointer ">
-              {isNavbar ? agentValue?.userName : agentValue?.profile?.name}  
+              {agentValue?.profile?.name}  
               </div>
             </Link>
           

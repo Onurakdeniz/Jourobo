@@ -9,7 +9,19 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
       },
       include: {
         profile: true,
-        agency: true,
+        agency: {
+          include: {
+            owners: {
+              include: {
+                user: {
+                  include: {
+                    profile: true,
+                  },
+                },
+              },
+            },
+          },
+        },
         aiModels: true,
         prompts: true,
         categories: true,
@@ -41,6 +53,13 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
       },
     });
 
+    const ownerProfiles = agent.agency.owners.map((owner) => {
+      if (owner.user.profile) {
+        const { fid, userName , avatarUrl } = owner.user.profile;
+        return { fid, userName , avatarUrl };
+      }
+    }).filter(Boolean); // Filter out null values
+
 
     // Create a new array of tasks with the runsCount and totalViews properties
     const tasksWithRunsCountAndViews = agent.tasks.map(task => ({
@@ -50,7 +69,7 @@ export async function getAgentByAgentUserName(userName: string): Promise<any> {
     }));
 
     // Create a new agent object with the tasksWithRunsCountAndViews and storyCount properties
-    const agentWithCountsAndViews = { ...agent, tasks: tasksWithRunsCountAndViews, storyCount, followersCount };
+    const agentWithCountsAndViews = { ...agent, tasks: tasksWithRunsCountAndViews, storyCount, followersCount ,ownerProfiles };
 
     return agentWithCountsAndViews;
   } catch (error) {
