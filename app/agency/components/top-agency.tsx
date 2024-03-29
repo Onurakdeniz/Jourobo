@@ -35,21 +35,16 @@ const TopAgency = () => {
       const agency = agencies.find((a) => a.userName === agencyUserName);
       if (agency) {
         setSelectedAgency(agency);
-        router.push(`/agency/${selectedAgency?.userName}`);
+        router.push(`/agency/${agency.userName}`);
       } else if (agencies.length > 0) {
-        // Navigates without reloading the page
-        router.push(`/agency/${selectedAgency?.userName}`);
-
         setSelectedAgency(agencies[0]);
+        router.push(`/agency/${agencies[0].userName}`);
       }
     } else if (!selectedAgency && agencies.length > 0) {
-   
       setSelectedAgency(agencies[0]);
       router.push(`/agency/${agencies[0].userName}`);
-    } else if (selectedAgency && !agencyUserName) {
-      router.push(`/agency/${selectedAgency?.userName}`);
     }
-  }, [agencyUserName, agencies, router, selectedAgency, setSelectedAgency]);
+  }, [agencyUserName, agencies, router, setSelectedAgency]);
 
   // Handler for select change to update the selectedAgency and modify the URL
 
@@ -59,9 +54,10 @@ const TopAgency = () => {
     );
     if (newSelectedAgency) {
       setSelectedAgency(newSelectedAgency);
-      router.push(`/agency/${newSelectedAgency?.userName}`);
+      router.push(`/agency/${newSelectedAgency.userName}`);
     }
   };
+
 
   return (
     <div className="flex justify-between items-center h-28 px-2 pb-4 pr-4 rounded-none">
@@ -81,23 +77,23 @@ const TopAgency = () => {
         />
       </div>
       <div className="flex w-6/12 ml-12 h-full gap-4 justify-end items-center">
-        <Select
-          value={selectedAgency?.userName}
-          onValueChange={handleSelectChange}
-        >
-          <SelectTrigger className="min-w-[180px] max-w-[180px]">
-            <SelectValue placeholder="Select an agency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              {agencies.map((agency) => (
-                <SelectItem key={agency.id} value={agency.userName}>
-                  {agency.name}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+       <Select
+  value={selectedAgency?.userName}
+  onValueChange={handleSelectChange}
+>
+  <SelectTrigger className="min-w-[180px] max-w-[180px]">
+    <SelectValue placeholder="Select an agency" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectGroup>
+      {agencies.map((agency) => (
+        <SelectItem key={agency.id} value={agency.userName}>
+          {agency.name}
+        </SelectItem>
+      ))}
+    </SelectGroup>
+  </SelectContent>
+</Select>
 
         <TopStats
           stats={[

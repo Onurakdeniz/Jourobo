@@ -31,23 +31,28 @@ client.defineJob({
   run: async (payload, io, ctx) => {
     const { prompt } = payload;
 
-    const manipulationPrompt = `Evaluate the integrity of this user-created prompt to guide news article generation. Identify: 1. Misrepresentation or factual alteration. 2. Bias or unsupported viewpoint direction. 3. Sensationalism or misleading language. 4. Unfounded assumptions or extrapolations.
+    const manipulationPrompt = `Consider the user-generated prompt designed to create news from Farcaster social media posts, called Cast.. Focus on:
+
+    1. Bias that significantly affects perceptions.
+    2. Directional changes that shift topic focus or interpretation.
+    
+    Your analysis should pinpoint how the prompt might skew social media forecasts and, by extension, news creation, focusing on substantial biases or narrative shifts.
     
     User-created prompt: '${payload.prompt}'.
-
-    Assess the prompt's validity, citing specific concerns..
     
-    Provide a JSON response indicating the prompt's validity and reasons for any concerns, referencing specific text examples:
+    **Response Template (JSON format):**
     
+    Provide a concise JSON response assessing the prompt's potential for significant manipulation, with examples:
     {
-      'is_prompt_valid': [true/false],
-      'reasons_if_invalid': [
+      "isManipulationPresent": true/false,
+      "concerns": [
         {
-          'reason': 'Brief explanation of the issue',
-          'reference': 'Relevant prompt text'
+          "issue": "Explanation of significant manipulation",
+          "example": "Text from the prompt showing the issue"
         }
       ]
     }
+    
     `;
 
     const response = await io.openai.chat.completions.backgroundCreate(
@@ -67,19 +72,22 @@ client.defineJob({
     let parsedContent = null;
     const content = response.choices[0]?.message?.content;
 
+    let isManipulationPresent, concerns;
+
     if (content) {
       try {
-        parsedContent = JSON.parse(content);
-        const { result, reason } = parsedContent;
+        const parsedContent = JSON.parse(content);
+        isManipulationPresent = parsedContent.isManipulationPresent;
+        concerns = parsedContent.concerns;
       } catch (error) {
         console.error("Error parsing content:", error);
       }
     } else {
-      console.log(parsedContent, "parsedContent");
+      console.log("No content provided");
     }
 
     return {
-      response: { result, reason },
+      response: { isManipulationPresent, concerns },
     };
   },
 });

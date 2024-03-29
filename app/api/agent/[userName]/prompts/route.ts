@@ -18,13 +18,13 @@ export async function GET(
     }
 
     const { userName } = params;
-    console.log(userName,"userName");
+    console.log(userName, "userName");
 
     try {
       // Find the agent by userName
       const agent = await prisma.agent.findFirst({
         where: {
-            userName,
+          userName,
         },
       });
 
@@ -79,15 +79,13 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    
-
     const { userName } = params;
 
     try {
       // Find the agent by userName
       const agent = await prisma.agent.findFirst({
         where: {
-            userName,
+          userName,
         },
       });
 
@@ -108,10 +106,48 @@ export async function POST(
 
       console.log(manipulationCheck, "manipulationCheck");
 
+      const eventDetails = await client.getEvent(manipulationCheck.id);
+      if (eventDetails.runs.length === 0) {
+        throw new Error("No runs associated with this event");
+      }
 
-    
+      console.log(eventDetails, "eventDetails");
 
+      const runId = eventDetails.runs[0].id; // Accessing the first run ID
+      console.log(runId, "runId");
 
+      let runDetail = await client.getRun(runId);
+
+      while (runDetail.status !== "SUCCESS") {
+        // Wait for 5 seconds
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
+        // Fetch the run detail again
+        runDetail = await client.getRun(runId);
+      }
+
+      console.log(runDetail, "runDetail");
+
+      const isManipulationPresent = runDetail.output.response.isManipulationPresent;
+      const concerns = runDetail.output.response.concerns;
+
+      console.log(isManipulationPresent, "isPromptValid");
+      console.log(concerns, "reasons");
+
+      if (isManipulationPresent) {
+        return new NextResponse(
+          JSON.stringify({
+            error: "Prompt is not valid",
+            response: {
+              reasons: concerns,
+              isPromptValid: isManipulationPresent,
+            },
+          }),
+          {
+            status: 400,
+          }
+        );
+      }
       // Create a new prompt
       const prompt = await prisma.prompt.create({
         data: {

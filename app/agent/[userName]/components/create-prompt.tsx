@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAgentPrompts } from "@/hooks/useFetchPrompts";
 import { client } from "@/trigger";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CreatePromptProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -30,7 +31,8 @@ interface CreatePromptProps {
 const CreatePrompt: React.FC<CreatePromptProps> = ({ setOpen }) => {
   const params = useParams();
   const { userName } = params;
-
+  const [error, setError] = useState<string | null>(null);
+  const [reasons, setReasons] = useState<Array<{ issue: string; example: string }> | null>(null);
   const { refetch: refetchPrompts } = useAgentPrompts();
 
   const CreatePromptSchema = z.object({
@@ -57,6 +59,8 @@ const CreatePrompt: React.FC<CreatePromptProps> = ({ setOpen }) => {
         data,
       };
 
+      
+
       const response = await fetch(`/api/agent/${userName}/prompts`, {
         method: "POST",
         headers: {
@@ -67,8 +71,11 @@ const CreatePrompt: React.FC<CreatePromptProps> = ({ setOpen }) => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        console.log("errorData", errorData);
+        setError(errorData.error || "Prompt is not valid");
+        setReasons(errorData.response?.reasons || []);
         throw new Error(errorData.message || "Something went wrong");
-        toast(errorData.message || "Something went wrong");
       }
 
       const res = await response.json();
@@ -83,6 +90,9 @@ const CreatePrompt: React.FC<CreatePromptProps> = ({ setOpen }) => {
       toast.error(error.message || "Failed to create prompt");
     }
   };
+
+  console.log("errors", errors);
+  console.log("reasons", reasons);
 
   return (
     <div>
@@ -130,6 +140,17 @@ const CreatePrompt: React.FC<CreatePromptProps> = ({ setOpen }) => {
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Creating prompt..." : "Create prompt"}
           </Button>
+<ScrollArea className="flex h-32">
+  <div className="flex flex-col gap-2">
+
+  {error && <p className="text-red-500">{error}</p>}
+    {reasons && reasons.map((reason, index) => (
+      <p  key={index} className="text-red-500 text-xs">{reason.issue}: {reason.example}</p>
+    ))}
+  </div>
+
+</ScrollArea>
+        
         </form>
       </Form>
     </div>
