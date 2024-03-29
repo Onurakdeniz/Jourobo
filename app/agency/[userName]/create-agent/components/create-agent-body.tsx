@@ -280,7 +280,7 @@ const CreateAgentBody = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Add Tags</FormLabel>
-                    <FormDescription>Add tags to your agent</FormDescription>
+                    <FormDescription>Add related tags to your agent</FormDescription>
 
                     <FormControl>
                       <Input
@@ -312,7 +312,7 @@ const CreateAgentBody = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Agent Description*</FormLabel>
-                    <FormDescription>Create your agent</FormDescription>
+                    <FormDescription>Users can see description in your profile.</FormDescription>
 
                     <FormControl>
                       <Textarea {...field} className="w-full h-24 border p-2" />
@@ -332,7 +332,7 @@ const CreateAgentBody = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Default Agent Instructions</FormLabel>
-                    <FormDescription>Create your agent</FormDescription>
+                    <FormDescription>Agent system prompt.</FormDescription>
 
                     <FormControl>
                       <Textarea {...field} className="w-full h-24 border p-2" />

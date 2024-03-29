@@ -117,12 +117,10 @@ const CreateAgentBody = () => {
     isSuccess,
   } = useAgentPrompts(agentUsername);
 
- 
-
   const handleSelectChange = (value) => {
-    const selectedPrompt = prompts.find(prompt => prompt.title === value);
+    const selectedPrompt = prompts.find((prompt) => prompt.title === value);
     setSelectedPrompt(selectedPrompt);
-    form.setValue('prompt.promptMessage.content', selectedPrompt.content);
+    form.setValue("prompt.promptMessage.content", selectedPrompt.content);
   };
 
   const postTaskData = async (taskData: CreateTaskType) => {
@@ -157,7 +155,6 @@ const CreateAgentBody = () => {
   const onSubmit: SubmitHandler<z.infer<typeof CreateTaskSchema>> = async (
     data
   ) => {
- 
     const response = await mutation.mutateAsync(data);
 
     router.push(`/agent/${agentUsername}`);
@@ -319,40 +316,44 @@ const CreateAgentBody = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Prompts</FormLabel>
-                    <Select
-                      onValueChange={handleSelectChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a prompt" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {prompts?.map((prompt, index) => (
-                          <SelectItem value={prompt.title} key={index}>
-                            {prompt.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {selectedPrompt && (
-                      <Textarea
-                        readOnly
-                        className="h-32 mt-6"
-                        value={selectedPrompt.content}
-                      />
+                    {prompts?.length > 0 ? (
+                      <>
+                        <Select
+                          onValueChange={handleSelectChange}
+                        
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a prompt" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {prompts.map((prompt, index) => (
+                              <SelectItem value={prompt.title} key={index}>
+                                {prompt.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {selectedPrompt && (
+                          <Textarea
+                            readOnly
+                            className="h-32 mt-6"
+                            value={selectedPrompt.content}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <p className="font-semibold text-orange-600"> Please create a prompt to add to the task.</p>
                     )}
                     <FormDescription>
-                      You can manage prompts in your{" "}
-                      <Link href="/examples/forms">prompt settings</Link>.
+                 You can create new prompt by clicking on the create prompt button.
+            
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-        
 
               <div className="flex gap-2 text-2xl w-full text-orange-600 font-bold pb-2 border-b py-4 my-4">
                 Sources

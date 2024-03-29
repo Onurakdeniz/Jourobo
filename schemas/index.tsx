@@ -599,6 +599,7 @@ enum SourceType {
 export const CreateTaskSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
+  agentPrompts : z.string().array().optional(),
   isStaticRun: z.boolean(),
   interval: z.string().optional(),
   isWithRecasts: z.boolean().optional(),

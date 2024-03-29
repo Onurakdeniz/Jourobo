@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { CircleCheck } from "lucide-react";
 import { CreateAgencySchema } from "@/schemas";
 import { useFetchAgencies } from "@/hooks/useFetchAgencies";
+import { Textarea } from "@/components/ui/textarea";
 
 interface CreateAgencyProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -201,8 +202,8 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
               <FormItem>
                 <FormLabel>Description*</FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
+                  <Textarea
+           
                     {...field}
                     className="w-full border rounded-lg p-2"
                   />

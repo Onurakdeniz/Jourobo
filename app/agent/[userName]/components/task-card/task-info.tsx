@@ -56,7 +56,7 @@ const TaskInfo = ({
               
             </TooltipTrigger>
             <TooltipContent>
-              <p>{isActive ? "Running" : "Stopped"}</p>
+              <p>{isActive ? "Successfull Run" : "Stopped"}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

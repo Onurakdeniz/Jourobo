@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const Agents = () => {
   const pathname = usePathname();
   const showTrendingAgents = pathname === "/feed";
-  const [activeTab, setActiveTab] = React.useState <string> ("");
+  const [activeTab, setActiveTab] = React.useState <string> ("trending");
 
   const { agentList, isLoading, error, refetch } = useFetchAgents(activeTab);
   console.log("activeTab", activeTab)

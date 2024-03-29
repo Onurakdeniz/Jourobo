@@ -65,7 +65,7 @@ const TaskActions: React.FC<TaskActionsProps> = ({ taskId, taskPromptId }) => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>View Agent</p>
+            <p>View Run Details</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
