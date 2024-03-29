@@ -164,6 +164,8 @@ model Agent {
   defaultAiModelId String?
   defaultAiModel   AIModel?        @relation("DefaultAIModelToAgent", fields: [defaultAiModelId], references: [id])
   categories       AgentCategory[] @relation("AgentToCategory")
+  systemMessageId  String?         // Added this line
+  systemMessage    SystemMessage?
 }
 
 model ProfileAgent {
@@ -376,7 +378,6 @@ model ToolCall {
 
 //////////////// LLM OUTPUT END  ///////////////////////
 
-//////////////// LLM INPUT START  ///////////////////////
 model Prompt {
   id             String          @id @default(uuid())
   outputStyle    String?
@@ -386,21 +387,21 @@ model Prompt {
   maxTokens      Int?
   responseFormat Json?
   seed           String?
-  tools          Tool[] // This field links to the Tool model
+  tools          Tool[]
   agentId        String
   tasks          Task[]
   agent          Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  promptMessage  PromptMessage[]
-  systemMessage  SystemMessage[]
+  promptMessage  PromptMessage?   
 }
 
 model PromptMessage {
   id        String   @id @default(uuid())
+  title     String? 
   role      String   @default("user")
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  promptId  String
+  promptId  String   @unique   
   prompt    Prompt   @relation(fields: [promptId], references: [id] , onDelete: Cascade)
 }
 
@@ -410,8 +411,8 @@ model SystemMessage {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  promptId  String
-  prompt    Prompt   @relation(fields: [promptId], references: [id])
+  agentId   String   @unique  // Added this line
+  agent     Agent    @relation(fields: [agentId], references: [id]) // Updated this line
 }
 
 model Tool {

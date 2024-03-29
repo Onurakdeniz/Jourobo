@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Coins, Eye, Newspaper } from "lucide-react";
+import { Coins, Eye, Newspaper , View } from "lucide-react";
 import React from "react";
 
 type AgentDescriptionProps = {
@@ -22,7 +22,7 @@ const AgentDescription: React.FC<AgentDescriptionProps> = ({
       <div className="flex gap-4 items-center">
         <Badge variant="category" className="flex gap-2 items-center py-1">
           <div className="flex gap-2 items-center">
-            <Coins size={16} />
+            <Newspaper size={16} />
 
             <div className="text-sm font-bold  self-end">{agentStoryCount}</div>
           </div>
@@ -30,7 +30,7 @@ const AgentDescription: React.FC<AgentDescriptionProps> = ({
 
         <Badge variant="category" className="flex gap-2 items-center py-1">
           <div className="flex gap-2 items-center">
-            <Newspaper size={16} />
+            <Eye size={16} />
             <div className="text-sm font-bold  self-end">{agentViewCount}</div>
           </div>
         </Badge>

@@ -331,7 +331,7 @@ const CreateAgentBody = () => {
                 name="profile.defaultInstructions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Default Agent Instructions*</FormLabel>
+                    <FormLabel>Default Agent Instructions</FormLabel>
                     <FormDescription>Create your agent</FormDescription>
 
                     <FormControl>

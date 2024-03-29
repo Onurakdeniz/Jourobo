@@ -14,7 +14,7 @@ export const useVoteStatus = (storyId: string): UseQueryResult<VoteStatusRespons
       }
       const data = await response.json();
   
-      console.log ('datafota', data);
+ 
       if (data.error) {
         throw new Error(data.error);
       }

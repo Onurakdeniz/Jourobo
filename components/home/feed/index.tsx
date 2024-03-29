@@ -20,23 +20,22 @@ const override: CSSProperties = {
 const Feed = () => {
   const [currentTab, setCurrentTab] = React.useState("trending");
   const router = useRouter();
- 
 
   const changeTab = (tab: string) => {
     setCurrentTab(tab);
   };
 
-  const { storiesState, isLoading, error, refetch } = useFetchStories({ sortType: currentTab });
+  const { storiesState, isLoading, error, refetch } = useFetchStories({
+    sortType: currentTab,
+  });
   useEffect(() => {
     if (storiesState.length > 0) {
       router.push(`feed/?id=${storiesState[0].id}`);
     }
-  }, [storiesState])
-
- 
+  }, [storiesState]);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full md:px-2">
       <Tabs
         defaultValue={currentTab}
         onValueChange={(value) => changeTab(value)}
@@ -46,11 +45,12 @@ const Feed = () => {
         {currentTab === "myfeed" && (
           <div className="mt-4 flex w-full h-16   items-center space-x-6">
             <Textarea
-    
               placeholder="
         Text your feed algorithm"
             />
-            <Button variant={"outline"} disabled>Filter </Button>
+            <Button variant={"outline"} disabled>
+              Filter{" "}
+            </Button>
           </div>
         )}
         {isLoading ? (

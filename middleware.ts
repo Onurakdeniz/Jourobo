@@ -7,6 +7,7 @@ export async function middleware(request: NextRequest) {
   // Paths that should not redirect authenticated users to /feed
   const noAuthRedirectPaths = [
     '/login',
+    '/feed',
     '/api/register',
     '/api/trigger',
     '/_next/static',
@@ -19,6 +20,7 @@ export async function middleware(request: NextRequest) {
 
   // Attempt to get the access token
   const accessToken = request.cookies.get("privy-token");
+ 
 
   // If the user is authenticated and on the root path, redirect to /feed
   if (accessToken && pathname === "/") {
@@ -33,10 +35,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // If the user is not authenticated and not on a noAuthRedirectPath, redirect to the login page
-  if (!accessToken && !shouldSkipAuthRedirect) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+ 
 
   // If the user is authenticated and on the login page, redirect to /feed
   if (accessToken && pathname === "/login") {

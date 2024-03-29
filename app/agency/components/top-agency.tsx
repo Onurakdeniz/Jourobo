@@ -27,13 +27,15 @@ const TopAgency = () => {
   const selectedAgency = useAgencyStore((state) => state.selectedAgency);
   const setSelectedAgency = useAgencyStore((state) => state.setSelectedAgency);
 
-  const agencyId = params.userName;
+  const agencyUserName = params.userName;
+  console.log("selectedAgency", selectedAgency);
 
   useEffect(() => {
-    if (agencyId) {
-      const agency = agencies.find((a) => a.userName === agencyId);
+    if (agencyUserName) {
+      const agency = agencies.find((a) => a.userName === agencyUserName);
       if (agency) {
         setSelectedAgency(agency);
+        router.push(`/agency/${selectedAgency?.userName}`);
       } else if (agencies.length > 0) {
         // Navigates without reloading the page
         router.push(`/agency/${selectedAgency?.userName}`);
@@ -41,10 +43,13 @@ const TopAgency = () => {
         setSelectedAgency(agencies[0]);
       }
     } else if (!selectedAgency && agencies.length > 0) {
-      router.push(`/agency/${agencies[0].userName}`);
+   
       setSelectedAgency(agencies[0]);
+      router.push(`/agency/${agencies[0].userName}`);
+    } else if (selectedAgency && !agencyUserName) {
+      router.push(`/agency/${selectedAgency?.userName}`);
     }
-  }, [agencyId, agencies, router, selectedAgency, setSelectedAgency]);
+  }, [agencyUserName, agencies, router, selectedAgency, setSelectedAgency]);
 
   // Handler for select change to update the selectedAgency and modify the URL
 
@@ -70,7 +75,9 @@ const TopAgency = () => {
           }
           entityLogo={selectedAgency?.logo || ""}
           ownerName={selectedAgency?.owners[0]?.user?.profile?.userName || ""}
-          ownerAvatar={selectedAgency?.owners[0]?.user?.profile?.avatarUrl || ""}
+          ownerAvatar={
+            selectedAgency?.owners[0]?.user?.profile?.avatarUrl || ""
+          }
         />
       </div>
       <div className="flex w-6/12 ml-12 h-full gap-4 justify-end items-center">

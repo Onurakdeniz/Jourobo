@@ -100,6 +100,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           model: "gpt-4-turbo-preview",
           promptMessage: {
             role: "user",
+            title : parsedData.prompt.promptMessage.title,
             content: parsedData.prompt.promptMessage.content,
           },
 

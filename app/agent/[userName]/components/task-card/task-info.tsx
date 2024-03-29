@@ -51,11 +51,9 @@ const TaskInfo = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              {isActive ? (
+           
                 <CircleDot size={24} className="text-green-600" />
-              ) : (
-                <CircleDot size={24} className="text-red-600" />
-              )}
+              
             </TooltipTrigger>
             <TooltipContent>
               <p>{isActive ? "Running" : "Stopped"}</p>

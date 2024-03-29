@@ -120,11 +120,7 @@ const CreateAgency: React.FC<CreateAgencyProps> = ({ setOpen }) => {
 
       const res = await response.json();
       toast("Agency created successfully", {
-        description: "Success Sunday, December 03, 2023 at 9:00 AM",
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
+         
       });
       refetch()
       router.push(`/agency/${res.agency.userName}`);

@@ -43,6 +43,7 @@
     "@trigger.dev/openai": "^2.3.18",
     "@trigger.dev/react": "^2.3.18",
     "@trigger.dev/sdk": "^2.3.18",
+    "@vercel/analytics": "^1.2.2",
     "@vercel/postgres": "^0.7.2",
     "api": "^6.1.1",
     "axios": "^1.6.8",
@@ -67,6 +68,7 @@
     "sonner": "^1.4.3",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "usehooks-ts": "^3.0.2",
     "vaul": "^0.9.0",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"

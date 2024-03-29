@@ -19,8 +19,7 @@ const FeedCard = ({ story }: { story: Story }) => {
     userName: post.author.userName,
     followers: post.author.followers,
   }));
-
-  console.log ("story", story)
+ 
 
   const aiModel =
     story.runs?.[0]?.results?.[0]?.LLMResponse?.[0]?.model ?? undefined;
@@ -34,7 +33,7 @@ const FeedCard = ({ story }: { story: Story }) => {
   const storyId = story.id;
 
   return (
-    <div className="flex-col flex w-full   gap-2 rounded-xl   ">
+    <div className="flex-col flex w-full   gap-2 rounded-xl  ">
       <CardHeader
         agent={story.storyAuthors[0].author}
         createdAt={story.createdAt}

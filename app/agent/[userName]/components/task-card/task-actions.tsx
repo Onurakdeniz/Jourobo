@@ -24,6 +24,7 @@ const TaskActions: React.FC<TaskActionsProps> = ({ taskId, taskPromptId }) => {
 
   return (
     <div className="flex w-2/12 justify-end gap-4 ">
+        {/*
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -47,6 +48,7 @@ const TaskActions: React.FC<TaskActionsProps> = ({ taskId, taskPromptId }) => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+        */}
 
       <TooltipProvider>
         <Tooltip>

@@ -69,7 +69,7 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
     );
   };
 
-  console.log (agentValue, "agentValue")
+ 
   return (
     <HoverCard>
       <HoverCardTrigger asChild>

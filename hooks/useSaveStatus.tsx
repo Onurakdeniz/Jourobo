@@ -1,34 +1,40 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { useBookmarkedStore } from "@/store";
+"use client";
+import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
+import { useAgentStore } from "@/store/agent";
+import { useParams } from "next/navigation";
 
 interface SaveStatusResponse {
   isBookmarked: boolean;
 }
 
-export const useSaveStatus = (
-  storyId: string
-): UseQueryResult<SaveStatusResponse, Error> => {
-  const isBookMarkedState = useBookmarkedStore((state) => state.isBookMarked);
-  const setIsBookMarked = useBookmarkedStore((state) => state.setIsBookMarked);
+export const useSaveStatus = (storyId: string) => {
+  async function fetchSaveStatus({ queryKey }: QueryFunctionContext<any>) {
+    // Extract agentUserName from the queryKey
+    const [_key, { storyId }] = queryKey;
+    const response = await fetch(`/api/save/${storyId}`);
+    if (!response.ok) {
+      throw new Error("Agent not found !");
+    }
+    let isBookmarked = false;
+    const data = await response.json();
+    if (data?.isBookmarked) {
+      isBookmarked = true;
+    }
 
-  return useQuery<SaveStatusResponse, Error>({
-    queryKey: ["saveStatus", storyId],
-    queryFn: async () => {
-      const response = await fetch(`/api/save/${storyId}`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
+    return isBookmarked;
+  }
 
-      let isBookmarked = false;
-
-      if (data) {
-        setIsBookMarked(data.isBookmarked);
-         isBookmarked = isBookMarkedState
-      }
-
-      return { isBookmarked };
-    },
-    // Additional options can be specified here
+  const {
+    data: isBookmarked,
+    isLoading,
+    error,
+    refetch,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["saveStatus", { storyId }], // Include agentUserName in the queryKey
+    queryFn: fetchSaveStatus,
+    refetchOnWindowFocus: false,
   });
+
+  return { isBookmarked, isLoading, error, refetch };
 };

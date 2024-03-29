@@ -5,7 +5,7 @@ import SearchBar from './search-bar'
 
 const Header = () => {
   return (
-    <div className='flex justify-between  container px-0 pt-2 my-2 pb-4 border-b '>
+    <div className='flex justify-between  container px-4 md:px-0 pt-2 my-2 pb-4 border-b '>
         <Logo />
         <SearchBar />
         <Profile />

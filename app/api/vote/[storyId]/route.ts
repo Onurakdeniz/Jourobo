@@ -31,7 +31,7 @@ export async function GET(
 
       // If voteStatus is not null, we return the vote type. Otherwise, return null.
       const voteType = voteStatus ? voteStatus.vote : null;
-      console.log ('voteType', voteType);
+ 
       return new NextResponse(JSON.stringify({ voteType }), {
         status: 200,
         headers: {

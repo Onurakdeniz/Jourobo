@@ -24,7 +24,7 @@ const PostFeed = ({ postsState }: { postsState: any }) => {
 
     return dateB.getTime() - dateA.getTime();
   });
-  console.log("dateSort", dateSort);
+ 
   return (
     <>
       <Tabs defaultValue="top" className="w-full">

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ClipboardCheck, FileText, Bot } from "lucide-react";
+import { ClipboardCheck, FileText, Bot, ClipboardType } from "lucide-react";
 import React from "react";
 import {
   Tooltip,
@@ -18,20 +18,21 @@ import {
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import CreatePrompt from "./create-prompt";
 
 const AgentButtons = () => {
   const [openAgency, setOpenAgency] = React.useState(false);
-  const [editAgency, setEditAgency] = React.useState(false);
   const [openAgent, setOpenAgent] = React.useState(false);
+  const [editAgent, setEditAgent] = React.useState(false);
+  const [openPrompt, setOpenPrompt] = React.useState(false);
+
   const params = useParams();
   const agentId = params.userName;
 
   return (
     <div className="flex gap-2 items-center">
-      
-
       <TooltipProvider>
-        <Dialog open={editAgency} onOpenChange={setEditAgency}>
+        <Dialog open={editAgent} onOpenChange={setEditAgent}>
           <Tooltip>
             <TooltipTrigger asChild>
               <DialogTrigger asChild>
@@ -55,9 +56,9 @@ const AgentButtons = () => {
           </DialogContent>
         </Dialog>
       </TooltipProvider>
-{/* 
+
       <TooltipProvider>
-        <Dialog open={openAgency} onOpenChange={setOpenAgency}>
+        <Dialog open={openPrompt} onOpenChange={setOpenPrompt}>
           <Tooltip>
             <TooltipTrigger asChild>
               <DialogTrigger asChild>
@@ -66,13 +67,13 @@ const AgentButtons = () => {
                   size="sm"
                   className="flex gap-1 h-full p-2"
                 >
-                  <FileText size={16} />
+                  <ClipboardType size={16} />
                   <span>Create Prompt</span>
                 </Button>
               </DialogTrigger>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Create Prompt</p>
+              <p>Edit Current Agent</p>
             </TooltipContent>
           </Tooltip>
 
@@ -83,36 +84,30 @@ const AgentButtons = () => {
                 Please fill in the information below to create a new prompt.
               </DialogDescription>
             </DialogHeader>
-
-
-
+            <CreatePrompt setOpen={setOpenPrompt} />
           </DialogContent>
         </Dialog>
       </TooltipProvider>
- */}
+
       <TooltipProvider>
-      <Tooltip>
-            <TooltipTrigger asChild>
-                <Link className="w-full" href={`/agent/${agentId}/create-task`}>
-            
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex gap-1 h-full p-2"
-                >
-                  <ClipboardCheck size={16} />
-                  <span>Create Task</span>
-                </Button>
-                </Link>
-        
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Create Task</p>
-            </TooltipContent>
-          </Tooltip>
-
-          </TooltipProvider>
-
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link className="w-full" href={`/agent/${agentId}/create-task`}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex gap-1 h-full p-2"
+              >
+                <ClipboardCheck size={16} />
+                <span>Create Task</span>
+              </Button>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Create Task</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 };

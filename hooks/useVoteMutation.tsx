@@ -37,7 +37,7 @@ export const useVoteMutation = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      console.log("Vote mutation successful:", data);
+   
       // Perform any additional actions or update the cache if needed
     },
     onError: (error) => {

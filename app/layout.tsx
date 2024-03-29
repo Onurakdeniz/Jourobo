@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 };
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/app/providers";
+import { Analytics } from '@vercel/analytics/react';
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex-col flex h-screen mx-2 md:mx-6   ">
         <PrivyProviderWrapper>
+        <Analytics />
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"

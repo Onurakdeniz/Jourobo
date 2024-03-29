@@ -22,12 +22,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   Select,
@@ -48,6 +55,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { CreateTaskSchema } from "@/schemas"; // Importing the schema
+import { useAgentPrompts } from "@/hooks/useFetchPrompts";
+import Link from "next/link";
+import CreatePrompt from "@/app/agent/[userName]/components/create-prompt";
 export const taskTypes = [
   { label: "Static Task", value: "true" }, // Representing static as true
   { label: "Dynamic Task", value: "false" }, // Representing dynamic as false
@@ -94,9 +104,26 @@ const CreateAgentBody = () => {
   } = form;
 
   const [showApiKey, setShowApiKey] = useState(false);
-
+  const [openPrompt, setOpenPrompt] = React.useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState(null);
   const router = useRouter();
   const agentUsername = useParams().userName;
+
+  const {
+    prompts,
+    isLoading,
+    error,
+    refetch: refetchPrompts,
+    isSuccess,
+  } = useAgentPrompts(agentUsername);
+
+ 
+
+  const handleSelectChange = (value) => {
+    const selectedPrompt = prompts.find(prompt => prompt.title === value);
+    setSelectedPrompt(selectedPrompt);
+    form.setValue('prompt.promptMessage.content', selectedPrompt.content);
+  };
 
   const postTaskData = async (taskData: CreateTaskType) => {
     const response = await fetch("/api/task", {
@@ -130,7 +157,7 @@ const CreateAgentBody = () => {
   const onSubmit: SubmitHandler<z.infer<typeof CreateTaskSchema>> = async (
     data
   ) => {
-    console.log(data, "motadata");
+ 
     const response = await mutation.mutateAsync(data);
 
     router.push(`/agent/${agentUsername}`);
@@ -178,7 +205,11 @@ const CreateAgentBody = () => {
                     <FormLabel>Task Description</FormLabel>
 
                     <FormControl>
-                      <Textarea {...field} className="w-full h-16 border p-2" />
+                      <Input
+                        type="text"
+                        {...field}
+                        className="w-full h-16 border p-2"
+                      />
                     </FormControl>
                     {errors.description && (
                       <FormMessage className="text-red-500">
@@ -245,31 +276,83 @@ const CreateAgentBody = () => {
                 />
               )}
 
-              <div className="flex gap-2 text-2xl w-full text-orange-600 font-bold pb-2 border-b py-4 my-4">
-                Prompt
+              <div className="flex gap-2 text-2xl justify-between w-full text-orange-600 font-bold pb-2 border-b py-4 my-4">
+                <span>Prompt </span>
+                <div>
+                  <TooltipProvider>
+                    <Dialog open={openPrompt} onOpenChange={setOpenPrompt}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex gap-1 h-full p-2"
+                            >
+                              <span>Create Prompt</span>
+                            </Button>
+                          </DialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit Current Agent</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <DialogContent className="w-full max-w-xl mx-auto flex-col flex h-fit py-6">
+                        <DialogHeader>
+                          <DialogTitle>Create Prompt</DialogTitle>
+                          <DialogDescription>
+                            Please fill in the information below to create a new
+                            prompt.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <CreatePrompt setOpen={setOpenPrompt} />
+                      </DialogContent>
+                    </Dialog>
+                  </TooltipProvider>
+                </div>
               </div>
 
               <FormField
                 control={form.control}
-                name="prompt.promptMessage.content"
+                name="agentPrompts"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Prompt*</FormLabel>
-                    <FormDescription>
-                      Provide your promt to the AI model.
-                    </FormDescription>
-
-                    <FormControl>
-                      <Textarea {...field} className="w-full h-24 border p-2" />
-                    </FormControl>
-                    {errors.prompt?.promptMessage?.content && (
-                      <FormMessage className="text-red-500">
-                        {errors.prompt?.promptMessage?.message}
-                      </FormMessage>
+                    <FormLabel>Prompts</FormLabel>
+                    <Select
+                      onValueChange={handleSelectChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a prompt" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {prompts?.map((prompt, index) => (
+                          <SelectItem value={prompt.title} key={index}>
+                            {prompt.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedPrompt && (
+                      <Textarea
+                        readOnly
+                        className="h-32 mt-6"
+                        value={selectedPrompt.title}
+                      />
                     )}
+                    <FormDescription>
+                      You can manage prompts in your{" "}
+                      <Link href="/examples/forms">prompt settings</Link>.
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
+
+        
 
               <div className="flex gap-2 text-2xl w-full text-orange-600 font-bold pb-2 border-b py-4 my-4">
                 Sources
@@ -340,11 +423,7 @@ const CreateAgentBody = () => {
                         : "Add the post urls or user & channel ids separated by commas."}
                     </FormDescription>
                     <FormControl>
-                      <Input
-                        type="text"
-                        {...field}
-                        className="w-full border p-2"
-                      />
+                      <Textarea {...field} className="w-full border h-24 p-2" />
                     </FormControl>
                     <FormMessage className="text-red-500">
                       {errors.source?.ids?.message?.toString()}

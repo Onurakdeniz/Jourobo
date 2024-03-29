@@ -18,7 +18,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
- 
+
 import { useQuery } from "@tanstack/react-query";
 import BeatLoader from "react-spinners/BeatLoader";
 import { useFetchAgencies } from "@/hooks/useFetchAgencies";
@@ -93,10 +93,7 @@ const page = () => {
             Please fill in the information below to create your agency.
           </DialogDescription>
         </DialogHeader>
-        <CreateAgency
-         setOpen={setOpen}
-        />
- 
+        <CreateAgency setOpen={setOpen} />
       </DialogContent>
     </Dialog>
   );

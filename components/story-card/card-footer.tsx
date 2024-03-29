@@ -24,7 +24,7 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
     useVoteStatus(storyId);
   const { mutate: toggleVote, isPending: isVotePending } = useVoteMutation();
 
-  const { data: saveStatus, refetch: refetchSaveStatus } =
+  const { isBookmarked , refetch: refetchSaveStatus } =
     useSaveStatus(storyId);
   const { mutate: toggleSave, isPending: isSavePending } = useSaveMutation();
   const { storiesState, isLoading, error, refetch : refetchBookmarks } =
@@ -34,9 +34,13 @@ const CardFooter = ({ storyId, views, vote, bookMarks }) => {
   const [localViews, setLocalViews] = useState(views); // Example initial state
   const [currentAction, setCurrentAction] = useState("");
   const [localVotes, setLocalVotes] = useState(vote);
-  const isBookMarked = useBookmarkedStore((state) => state.isBookMarked);
+  const [isBookMarked, setIsBookMarked] = useState(isBookmarked);
 
-  console.log("voteStatus?.voteType", voteStatus?.voteType);
+  useEffect(() => {
+    setIsBookMarked(isBookmarked);
+  }, [isBookmarked]);
+
+ 
 
   const handleVote = (voteAction: "UP" | "DOWN") => {
     toggleVote(
