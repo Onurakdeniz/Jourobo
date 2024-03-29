@@ -72,7 +72,8 @@ client.defineJob({
     let parsedContent = null;
     const content = response.choices[0]?.message?.content;
 
-    let isManipulationPresent, concerns;
+    let isManipulationPresent, concerns , ignore
+    ignore = false
 
     if (content) {
       try {
@@ -87,7 +88,7 @@ client.defineJob({
     }
 
     return {
-      response: { isManipulationPresent, concerns },
+      response: { isManipulationPresent, concerns , ignore },
     };
   },
 });

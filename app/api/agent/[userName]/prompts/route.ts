@@ -99,6 +99,8 @@ export async function POST(
       console.log(requestBody);
       const data = requestBody.data; // Access data directly from requestBody
 
+      /*
+
       const manipulationCheck = await client.sendEvent({
         name: "manipulation-check",
         payload: { prompt: data.message },
@@ -128,26 +130,28 @@ export async function POST(
 
       console.log(runDetail, "runDetail");
 
-      const isManipulationPresent = runDetail.output.response.isManipulationPresent;
+      const isManipulationPresent =
+        runDetail.output.response.isManipulationPresent;
       const concerns = runDetail.output.response.concerns;
+      const ignore = runDetail.output.response.ignore;
 
-      console.log(isManipulationPresent, "isPromptValid");
-      console.log(concerns, "reasons");
-
-      if (isManipulationPresent) {
-        return new NextResponse(
-          JSON.stringify({
-            error: "Prompt is not valid",
-            response: {
-              reasons: concerns,
-              isPromptValid: isManipulationPresent,
-            },
-          }),
-          {
-            status: 400,
-          }
-        );
+      if (!ignore) {
+        if (isManipulationPresent) {
+          return new NextResponse(
+            JSON.stringify({
+              error: "Prompt is not valid",
+              response: {
+                reasons: concerns,
+                isPromptValid: isManipulationPresent,
+              },
+            }),
+            {
+              status: 400,
+            }
+          );
+        }
       }
+*/
       // Create a new prompt
       const prompt = await prisma.prompt.create({
         data: {
