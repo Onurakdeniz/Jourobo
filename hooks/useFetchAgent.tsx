@@ -1,24 +1,30 @@
 "use client";
 import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 import { useAgentStore } from "@/store/agent";
-import { useParams } from "next/navigation";
+import { useAgentCardStore } from "@/store/agent-card";
 
-export const useFetchAgent = () => {
-  const { userName: agentUserName } = useParams(); // Destructuring to get userName directly
 
+export const useFetchAgent = (withDetails = true , userName:string) => { // Added withDetails parameter
+ 
   const agentState = useAgentStore((state) => state.agent);
   const setAgent = useAgentStore((state) => state.setAgent);
 
+  const agentCardState = useAgentCardStore((state) => state.agent);
+  const setAgentCard = useAgentCardStore((state) => state.setAgent);
+
   async function fetchAgentData({ queryKey }: QueryFunctionContext<any>) {
-    // Extract agentUserName from the queryKey
-    const [_key, { agentUserName }] = queryKey;
-    const response = await fetch(`/api/agent/${agentUserName}`);
+    const [_key, { userName }] = queryKey;
+    // Adjust the fetch URL based on withDetails
+    const url = `/api/agent/${userName}${withDetails ? '?details=true' : ''}`;
+    console.log(url,"url");
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Agent not found !");
     }
+ 
     const data = await response.json();
  
-    return data.agent;
+    return data;
   }
 
   const {
@@ -28,16 +34,21 @@ export const useFetchAgent = () => {
     refetch,
     isSuccess,
   } = useQuery({
-    queryKey: ["agent", { agentUserName }], // Include agentUserName in the queryKey
+    queryKey: ["agent", { userName, withDetails }], // Include withDetails in the queryKey to differentiate queries
     queryFn: fetchAgentData,
     refetchOnWindowFocus: false,
- 
   });
 
-  if (isSuccess) {
-    setAgent(agent);
-  }
- 
 
-  return { agentState, isLoading, error, refetch };
+  if (isSuccess) {
+    if (withDetails) {
+      setAgent(agent);
+    } else {
+      setAgentCard(agent);
+    }
+  }
+
+  return withDetails 
+  ? { agentState: agentState, isLoading, error, refetch }
+  : { agentState: agentCardState, isLoading, error, refetch };
 };

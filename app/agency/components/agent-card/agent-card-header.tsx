@@ -51,16 +51,16 @@ const AgentInfo: React.FC<AgentInfoProps> = ({
 
       <div className="flex-col flex gap-1">
         <div className="flex gap-2 items-center w-full flex-wrap">
-        {categories &&
-  categories.slice(0, 3).map((category) => (
-    <Badge
-      key={category.id}
-      variant="outline"
-      className="flex font-light py-1 px-2 text-[10px] rounded-sm"
-    >
-      {category.name}
-    </Badge>
-  ))}
+          {categories &&
+            categories.slice(0, 3).map((category) => (
+              <Badge
+                key={category.id}
+                variant="outline"
+                className="flex font-light py-1 px-2 text-[10px] rounded-sm"
+              >
+                {category.name}
+              </Badge>
+            ))}
         </div>
       </div>
     </div>

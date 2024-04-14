@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
         (a, b) => b.created.getTime() - a.created.getTime()
       );
     }
-    console.log("sortedAgents", sortedAgents)
+ 
     return NextResponse.json(sortedAgents, { status: 200 });
   } catch (error) {
     console.error(

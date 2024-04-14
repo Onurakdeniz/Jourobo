@@ -17,6 +17,7 @@ export async function GET(
     }
 
     const { agentUsername } = params;
+    console.log(agentUsername,"agentUsername");
 
     try {
       // Find the agent by userName

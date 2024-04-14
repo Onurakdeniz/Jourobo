@@ -1,17 +1,33 @@
 import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 import { usePostStore } from "@/store/posts";
 import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export const useFetchPostsByStoryId = () => {
-  const params = useSearchParams();
-  const storyId = params.get("id");
+  const params = useParams();
+
+  let storyId = "";
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  if (id) {
+    storyId = id;
+  } else {
+    storyId = params.id as string;
+  }
+
+ 
+
   const postsState = usePostStore((state) => state.posts);
   const summaryState = usePostStore((state) => state.summary);
   const sourceState = usePostStore((state) => state.source);
   const setSummary = usePostStore((state) => state.setSummary);
   const setSource = usePostStore((state) => state.setSource);
   const setPosts = usePostStore((state) => state.setPosts);
-  const setStoryInformation = usePostStore((state) => state.setStoryInformation);
+  const setStoryInformation = usePostStore(
+    (state) => state.setStoryInformation
+  );
 
   // Function to fetch posts data for a given story ID
   const fetchPostsData = async ({
@@ -49,5 +65,12 @@ export const useFetchPostsByStoryId = () => {
   }
 
   // Return necessary variables for component consumption
-  return { postsState, sourceState, summaryState, isLoading: !storyId || isLoading, error, refetch };
+  return {
+    postsState,
+    sourceState,
+    summaryState,
+    isLoading: !storyId || isLoading,
+    error,
+    refetch,
+  };
 };

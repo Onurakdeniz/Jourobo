@@ -15,9 +15,11 @@ const override: CSSProperties = {
 };
 
 const page = () => {
-  const { agentState, isLoading, error, refetch } = useFetchAgent();
-  const agentId = useParams().userName;
  
+ 
+  const userName = "ethereum";
+  const withDetails = true; // or false or undefined
+  const { agentState, isLoading, error, refetch } =  useFetchAgent(withDetails, userName);
 
   const taskCount = agentState?.tasks?.length || 0;
 

@@ -2,13 +2,19 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useSearchParams } from "next/navigation";
 
 const FeedTop = () => {
+
+  const searchParams = useSearchParams();
+  const agent = searchParams.get("agent");
+
   const tabs = [
     { value: 'trending', text: 'Trending' },
     { value: 'latest', text: 'Latest' },
-    { value: 'myfeed', text: 'My Feed' },
+    ...(agent ? [] : [{ value: 'myfeed', text: 'My Feed' }]),
   ];
+  
   return (
 <TabsList className="flex gap-3 w-full px-0 bg-background justify-start font-bold">
   {tabs.map((tab) => (

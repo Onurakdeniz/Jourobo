@@ -13,8 +13,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
     const pageSize = 10;
     const skip = (page - 1) * pageSize;
-    const bookmarked = req.nextUrl.searchParams.get("bookmarked") === "true";
+    const bookmarked = req.nextUrl.searchParams.get("bookmarked") === "false";
     console.log("bookmarked", bookmarked);
+
+    
     const bookmarks = await prisma.bookmark.findMany({
       where: {
         userId: currentUser.id,

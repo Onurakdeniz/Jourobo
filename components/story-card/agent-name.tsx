@@ -80,6 +80,7 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
 </AvatarFallback>
               <AvatarImage src={agentValue?.profile?.avatarUrl} />
             </Avatar>
+            <Link  href={`/feed?agent=${agentValue?.userName}`}>
           <div
             className={`capitalize cursor-pointer hover:text-primary/70 ${
               isNavbar ? "text-sm" : "text-lg"
@@ -87,6 +88,7 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
           >
         {  agentValue?.profile?.name}
           </div>
+        </Link>
           {!isNavbar && <div className="text-xs ml-1 text-muted-foreground">{storyDate}</div>}
         </div>
       </HoverCardTrigger>
@@ -103,11 +105,11 @@ const AgentName = ({ agentValue, createdAt, isNavbar  }) => {
               </AvatarFallback>
               <AvatarImage src={agentValue?.profile?.avatarUrl} />
             </Avatar>
-            <Link href={`/agent/${agentValue?.userName}`}>
-              <div className="text-sm capitalize hover:cursor-pointer ">
+ 
+              <div className="text-sm capitalize   ">
               {agentValue?.profile?.name}  
               </div>
-            </Link>
+ 
           
             <TooltipProvider>
               <Tooltip>

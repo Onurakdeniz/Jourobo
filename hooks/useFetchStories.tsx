@@ -5,6 +5,9 @@ import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 interface FetchStoriesOptions {
   sortType?: string;
   bookmarked?: boolean;
+  agent?: string;
+  tags?: string;
+  id? : string;
 }
 
 export const useFetchStories = (options: FetchStoriesOptions = {}) => {
@@ -16,27 +19,39 @@ export const useFetchStories = (options: FetchStoriesOptions = {}) => {
   const fetchStoriesData = async ({
     queryKey,
   }: QueryFunctionContext<[string, FetchStoriesOptions]>) => {
-    const { sortType, bookmarked } = queryKey[1];
-
-    let url;
-
-    if (options.bookmarked) {
- 
-      url = "/api/story/bookmarked"; 
+    const { sortType, bookmarked, agent, tags } = queryKey[1];
+    console.log("queryKey", queryKey);
+    let url = "/api/story"; // Default URL
+    const params = new URLSearchParams(); // Initialize URLSearchParams
+    
+    if (options.id) {
+      // If an ID is provided, we're fetching a specific story
+      params.append("id", options.id);
+      url += `?${params.toString()}`; // Append parameters to the URL
+    } else if (options.bookmarked === true) {
+      // If fetching bookmarked stories, change the URL
+      url = "/api/story/bookmarked";
     } else {
-      url = "/api/story";  
+      // For general story fetching with optional filters
       if (options.sortType) {
- 
-        url += `?${new URLSearchParams({ sort: options.sortType }).toString()}`;
+        params.append("sort", options.sortType);
+      }
+      if (options.agent) {
+        params.append("agent", options.agent);
+      }
+      if (options.tags) {
+        params.append("tags", options.tags);
+      }
+      if (params.toString()) {
+        url += `?${params.toString()}`; // Append parameters to the URL
       }
     }
-
+    
+    console.log("url", url);
     const response = await fetch(url);
-
     if (!response.ok) {
       throw new Error("Stories fetch failed!");
     }
-
     return response.json();
   };
 

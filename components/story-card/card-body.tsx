@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Sue_Ellen_Francisco } from "next/font/google";
 import { LLMContentSchema } from "@/schemas/story";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   HoverCard,
   HoverCardContent,
@@ -22,11 +24,21 @@ const CardBody = ({
   aiModel: string;
   storyId: string;
 }) => {
+  const searchParams = useSearchParams();
+  const agent = searchParams.get("agent");
+  const tags = searchParams.get("tags");
+
+  const router = useRouter();
+  let url = "/feed";
+  if (agent) url += `?agent=${agent}`;
+  if (tags) url += (url.includes("?") ? "&" : "?") + `tags=${tags}`;
+  if (storyId) url += (url.includes("?") ? "&" : "?") + `id=${storyId}`;
+
   return (
     <div className="flex w-full flex-wrap">
       <div className="flex-col flex gap-4 w-full  flex-1">
         <div className="flex w-full justify-between mt-2 text-pretty   capitalize  text-lg  ">
-          <Link href={`?id=${storyId}`}>
+          <Link href={url}>
             <div
               className="font-semibold overflow-hidden"
               style={{
@@ -65,7 +77,10 @@ const CardBody = ({
         <div className="flex-col flex gap-3 text-sm    py-2 pr-2">
           <div className="flex-col flex w-full  font-light text-base dark:text-neutral-400 text-neutral-600   overflow-hidden ">
             {content?.content?.split("\n\n").map((paragraph, index) => (
-              <div key={index} className="mb-4  w-full flex leading-relax text-pretty  text-ellipsis  ">
+              <div
+                key={index}
+                className="mb-4  w-full flex leading-relax text-pretty  text-ellipsis  "
+              >
                 {paragraph}
               </div>
             ))}
